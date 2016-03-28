@@ -1,0 +1,11 @@
+/nbproject/
+/compiled/
+/vendor/
+/config.php
+/composer.lock
+/data/
+/bower_components/
+/node_modules/
+/www/*
+!/www/index.php
+*.swp

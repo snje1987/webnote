@@ -1,0 +1,15 @@
+<{use Org\Snje\Minifw as FW}>
+<{use Org\Snje\Webnote as WN}>
+<{$mbx = $args->get_path()}>
+<ul id="mbx" class="clearfix">
+    <{foreach $mbx $k $v}>
+        <{if $k == 0}>
+        <li class="book"><a href="/view/<{ $v['path']}>"><{ $v['name']}></a></li>
+        <{else}>
+        <li class="dir"><a href="/view/<{ $v['path']}>"><{ $v['name']}></a></li>
+        <{/if}>
+    <{/foreach}>
+</ul>
+
+
+

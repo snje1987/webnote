@@ -1,0 +1,14 @@
+<{use Org\Snje\Minifw as FW}>
+<{use Org\Snje\Webnote as WN}>
+<{$list = $args->get_list()}>
+<div id="list">
+    <{foreach $list['dirs'] $v}>
+    <a class="dir" href="/view/<{ $v['path']}>"><{ $v['name']}></a>
+    <{/foreach}>
+    <{foreach $list['pages'] $v}>
+    <a class="page" href="/view/<{ $v['path']}>"><{ $v['name']}></a>
+    <{/foreach}>
+</div>
+
+
+

@@ -1,0 +1,15 @@
+<{inc header}>
+<form class="fsubmit" acton="/open/" method="post" enctype="multipart/form-data">
+    <div style="width:500px;">
+        <p class="line"><span class="tag" style="width:100px;">笔记本路径</span><span class="item" style="width:400px;"><input type="text" name="path" /></span></p>
+        <p class="bar"><input type="submit" name="" value="提交" /></p>
+    </div>
+</form>
+<script type="text/javascript">
+(function($){
+    $(document).ready(function(){
+        $('.fsubmit').fsubmit();
+    });
+})(jQuery);
+</script>
+<{inc footer}>

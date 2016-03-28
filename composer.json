@@ -1,0 +1,12 @@
+{
+    "require": {
+        "snje1987/minifw": "master@dev",
+        "michelf/php-markdown": "1.*",
+        "klaussilveira/gitter": "master@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Org\\Snje\\Webnote\\": "src/"
+        }
+    }
+}

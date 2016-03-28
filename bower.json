@@ -1,0 +1,25 @@
+{
+    "name": "webnote",
+    "description": "一个简单的网页记事本",
+    "main": "",
+    "authors": [
+        "Yang Ming <yangming0116@163.com>"
+    ],
+    "license": "GPL-3.0",
+    "moduleType": [],
+    "homepage": "https://github.com/snje1987/webnote#readme",
+    "private": true,
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "jquery": "^1.8.3",
+        "ueditor": "^1.4.3",
+        "jquery-form": "^3.46.0",
+        "highlight": "^9.2.0"
+    }
+}
