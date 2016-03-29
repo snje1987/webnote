@@ -19,6 +19,9 @@ class Book{
     protected $cur_dir = '';
     protected $compiled = false;
 
+    protected $encoding = '';
+    protected $fsencoding = '';
+
     protected static $link_method = [
         'F' => 'file',
         'V' => 'view',
@@ -34,6 +37,7 @@ class Book{
             $this->path .= '/';
         }
         $info_file = $this->path . 'book.json';
+        $info_file = $this->tofs($info_file);
         if(!file_exists($info_file)){
             throw new FW\Exception('笔记本不存在');
         }
@@ -43,10 +47,13 @@ class Book{
         }
         $this->data = \Zend\Json\Json::decode($str, \Zend\Json\Json::TYPE_ARRAY);
         $this->cur_page = '';
+        $this->encoding = FW\Config::get('main', 'encoding', 'utf-8');
+        $this->fsencoding = FW\Config::get('main', 'fsencoding', 'utf-8');
     }
 
     public function save(){
         $info_file = $this->path . 'book.json';
+        $info_file = $this->tofs($info_file);
         $str = \Zend\Json\Json::encode($this->data);
         if(DEBUG){
             $str = \Zend\Json\Json::prettyPrint($str, ["indent" => "    "]);
@@ -87,6 +94,7 @@ class Book{
             return '';
         }
         $dest = $this->path . 'html/' . $this->cur_page . '.html';
+        $dest = $this->tofs($dest);
         if(file_exists($dest)){
             return file_get_contents($dest);
         }
@@ -116,7 +124,17 @@ class Book{
         if($dir != ''){
             $dir .= '/';
         }
-        $list = FW\File::ls($this->path . 'data/' . $dir);
+
+        $path = $this->path . 'data/' . $dir;
+
+        $path = $this->tofs($path);
+
+        $list = FW\File::ls($path);
+
+        foreach ($list as $k => $v){
+            $list[$k]['name'] = $this->fromfs($v['name']);
+        }
+
         usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
         $pages = [];
         $dirs = [];
@@ -152,7 +170,16 @@ class Book{
             if($parent != ''){
                 $parent .= '/';
             }
-            $list = FW\File::ls($this->path . 'data/' . $parent);
+
+            $path = $this->path . 'data/' . $parent;
+            $path = $this->tofs($path);
+
+            $list = FW\File::ls($path);
+
+            foreach ($list as $k => $v){
+                $list[$k]['name'] = $this->fromfs($v['name']);
+            }
+
             usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
             $dirs = [];
             foreach($list as $v){
@@ -174,6 +201,7 @@ class Book{
             return true;
         }
         $path = $this->path . 'file/' . $file;
+        $path = $this->tofs($path);
         if(file_exists($path)){
             $fi = new \finfo(FILEINFO_MIME_TYPE);
             $mime_type = $fi->file($path);
@@ -255,6 +283,20 @@ class Book{
         return substr($page, $pos + 1);
     }
 
+    public function fromfs($str){
+        if($this->encoding != $this->fsencoding){
+            $str = iconv($this->fsencoding, $this->encoding, $str);
+        }
+        return $str;
+    }
+
+    public function tofs($str){
+        if($this->encoding != $this->fsencoding){
+            $str = iconv($this->encoding, $this->fsencoding, $str);
+        }
+        return $str;
+    }
+
     /*
      * 笔记本的内部引用链接，格式[[方法:笔记本名//路径]]
      */
@@ -280,6 +322,8 @@ class Book{
         }
         //如果页面不存在，则尝试显示指定名称的目录
         $file = $this->path . 'data/' . $page;
+        $file = $this->tofs($file);
+
         if(is_dir($file)){
             $sub = $this->get_first_page('data/' . $page);
             if($sub != ''){//目录中存在页面就显示
@@ -296,10 +340,12 @@ class Book{
 
     protected function show_md($page){
         $src = $this->path . 'data/' . $page . '.md';
+        $src = $this->tofs($src);
         if(!is_file($src)){
             return false;
         }
         $dest = $this->path . 'html/' . $page . '.html';
+        $dest = $this->tofs($dest);
         $srctime = filemtime($src);
         $desttime = 0;
         if(file_exists($dest)){
@@ -330,7 +376,16 @@ class Book{
     }
 
     protected function get_first_page($path = 'data/'){
-        $list = FW\File::ls($this->path . $path);
+
+        $path = $this->path . $path;
+        $path = $this->tofs($path);
+
+        $list = FW\File::ls($path);
+
+        foreach ($list as $k => $v){
+            $list[$k]['name'] = $this->fromfs($v['name']);
+        }
+
         usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
         $dir = '';
         $page = '';
