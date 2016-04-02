@@ -3,10 +3,7 @@ namespace Org\Snje\Webnote;
 use Org\Snje\Minifw as FW;
 use Org\Snje\Webnote as WN;
 
-define('WEB_ROOT', dirname(__DIR__));
-define('CFG_FILE', '/config.php');
-
-require_once WEB_ROOT . '/vendor/autoload.php';
+require_once '../vendor/autoload.php';
 
 $app = new FW\System();
 
