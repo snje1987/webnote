@@ -1,20 +1,28 @@
+var scripts = [
+    'bower_components/jquery/dist/jquery.js',
+    'bower_components/jquery-form/jquery.form.js',
+    'bower_components/highlight/build/highlight.pack.js',
+    'theme/def/script/common.js'
+];
+
+var styles = [
+    'theme/style/common.css',
+    'theme/def/style/common.css',
+    'bower_components/highlight/build/demo/styles/github.css'
+];
+
 module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         concat: {
-            def: {
+            scripts: {
                 files: {
-                    'www/theme/def/script/common.js': [
-                        'bower_components/jquery/dist/jquery.js',
-                        'bower_components/jquery-form/jquery.form.js',
-                        'bower_components/highlight/build/browser/highlight.pack.js',
-                        'theme/def/script/common.js'
-                    ],
-                    'www/theme/def/style/common.css': [
-                        'theme/style/common.css',
-                        'theme/def/style/common.css',
-                        'bower_components/highlight/build/browser/demo/styles/github.css'
-                    ]
+                    'www/theme/def/script/common.js': scripts
+                }
+            },
+            styles: {
+                files: {
+                    'www/theme/def/style/common.css': styles
                 }
             }
         },
@@ -44,6 +52,29 @@ module.exports = function (grunt) {
                 }
             }
         },
+        watch: {
+            manage: {
+                files: scripts,
+                tasks: ['concat:scripts'],
+                options: {
+                    debounceDelay: 250
+                }
+            },
+            web: {
+                files: styles,
+                tasks: ['concat:styles'],
+                options: {
+                    debounceDelay: 250
+                }
+            },
+            image: {
+                files: ['theme/def/image/**'],
+                tasks: ['copy:def'],
+                options: {
+                    debounceDelay: 250
+                }
+            }
+        },
         clean: {
             def: {
                 files: [
@@ -59,6 +90,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // 默认被执行的任务列表。
     grunt.registerTask('default', ['concat', 'copy']);
