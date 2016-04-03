@@ -10,7 +10,6 @@ $cfg['main']['fsencoding'] = 'utf-8';
 $cfg['main']['encoding'] = 'utf-8';
 $cfg['main']['db'] = '';
 $cfg['main']['theme'] = 'def';
-$cfg['route'] = ['call'];
 $cfg['mysql'] = [];
 $cfg['sqlite'] = [];
 $cfg['save'] = [
