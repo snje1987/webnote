@@ -9,21 +9,18 @@
  */
 
 namespace Org\Snje\Webnote;
+
 use Org\Snje\Minifw as FW;
 
-class Book{
+class Book {
 
     protected $path = '';
     protected $data = [];
     protected $cur_page = '';
     protected $cur_dir = '';
-    protected $compiled = false;
-
     protected $encoding = '';
     protected $fsencoding = '';
-
     public static $always_compile;
-
     protected static $link_method = [
         'F' => 'file',
         'V' => 'view',
@@ -32,19 +29,15 @@ class Book{
     const Type_All = 0;
     const Type_Enable = 1;
 
-    public function __construct($path){
+    public function __construct($path) {
         $path = str_replace('\\', '/', $path);
         $this->path = strval($path);
-        if(substr($this->path, -1) !== '/'){
+        if (substr($this->path, -1) !== '/') {
             $this->path .= '/';
         }
         $info_file = $this->path . 'book.json';
-        $info_file = $this->tofs($info_file);
-        if(!file_exists($info_file)){
-            throw new FW\Exception('笔记本不存在');
-        }
-        $str = file_get_contents($info_file);
-        if($str === false){
+        $str = FW\File::get_content($info_file, $this->fsencoding);
+        if ($str === false) {
             throw new FW\Exception('读取信息失败');
         }
         $this->data = \Zend\Json\Json::decode($str, \Zend\Json\Json::TYPE_ARRAY);
@@ -53,60 +46,89 @@ class Book{
         $this->fsencoding = FW\Config::get('main', 'fsencoding', 'utf-8');
     }
 
-    public function save(){
+    public function save() {
         $info_file = $this->path . 'book.json';
-        $info_file = $this->tofs($info_file);
         $str = \Zend\Json\Json::encode($this->data);
-        if(DEBUG){
+        if (DEBUG) {
             $str = \Zend\Json\Json::prettyPrint($str, ["indent" => "    "]);
         }
-        return file_put_contents($info_file, $str);
+        return FW\File::put_content($info_file, $str, $this->fsencoding);
     }
 
-    public function show($page){
-        $page = self::format_page($page);
-        if($page != ''){//如果不为空，尝试显示页面
-            $this->show_page($page);
-        }
-        else{
-            //尝试显示笔记本中的第一个页面
-            $page = $this->get_first_page();
-            if($page != ''){
-                FW\Server::redirect('/view/' . $this->data['name'] . '/' . $page);
+    public function set_path($path) {
+        if ($path != '') {
+            if (FW\File::call('is_file', $this->path . 'data/' . $path . '.md', $this->fsencoding)) {//存在相应的文件
+                $this->cur_page = self::basename($path);
+                $this->cur_dir = self::dirname($path);
+            } else if (FW\File::call('is_dir', $this->path . 'data/' . $path, $this->fsencoding)) {//存在相应目录
+                $page = $this->get_first_page('data/' . $path);
+                if ($page != '') {//目录中存在页面就显示
+                    FW\Server::redirect('/view/' . $this->data['name'] . '/' . $path . '/' . $page);
+                }
+                //不存在则显示空模板
+                $this->cur_dir = $path;
+                $this->cur_page = '';
+            } else {//文件不存在
+                FW\Server::redirect('/view/' . $this->data['name'] . '/' . self::dirname($path));
             }
-            //没有页面则显示空
-            $this->cur_dir = $page;
-            FW\Tpl::display('/view/empty', $this);
+        } else {
+            $path = $this->get_first_page();
+            if ($path != '') {
+                FW\Server::redirect('/view/' . $this->data['name'] . '/' . $path);
+            } else {
+                $this->cur_dir = '';
+                $this->cur_page = '';
+            }
         }
     }
 
-    public function open($post){
+    public function open($post) {
         $books = Info::get('books', []);
-        if(isset($books[$this->data['name']])){
+        if (isset($books[$this->data['name']])) {
             throw new FW\Exception('笔记本已存在');
         }
         $books[$this->data['name']] = ['path' => $this->path];
         Info::set('books', $books);
         Info::save();
-        return ['returl' => '/view/'.$this->data['name']];
+        return ['returl' => '/view/' . $this->data['name']];
     }
 
-    public function get_html(){
-        if(!$this->compiled){
+    public function get_content() {
+        if ($this->cur_page == '') {
             return '';
         }
-        $dest = $this->path . 'html/' . $this->cur_page . '.html';
-        $dest = $this->tofs($dest);
-        if(file_exists($dest)){
-            return file_get_contents($dest);
+
+        $src = $this->path . 'data/' . $this->cur_dir . '/' . $this->cur_page . '.md';
+        if (!FW\File::call('is_file', $src, $this->fsencoding)) {
+            return '';
         }
-        return '';
+        $dest = $this->path . 'html/' . $this->cur_dir . '/' . $this->cur_page . '.html';
+        $srctime = FW\File::call('filemtime', $src, $this->fsencoding);
+        $desttime = 0;
+        if (file_exists($dest)) {
+            $desttime = FW\File::call('filemtime', $dest, $this->fsencoding);
+        }
+        $str = '';
+        //只在更新后重新编译
+        if (self::$always_compile == 1 || $desttime == 0 || $desttime <= $srctime) {
+            $str = FW\File::get_content($src, $this->fsencoding);
+            $transform = new \Michelf\MarkdownExtra();
+            $transform->url_filter_func = [$this, 'parse_link'];
+            $str = $transform->transform($str);
+            FW\File::mkdir(dirname($dest));
+            FW\File::put_content($dest, $str, $this->fsencoding);
+        } else {
+            $str = FW\File::get_content($dest, $this->fsencoding);
+        }
+        Info::set('last_page', $this->data['name'] . '/' . $this->cur_page);
+        Info::save();
+        return $str;
     }
 
-    public function get_path(){
+    public function get_path() {
         $dir = $this->cur_dir;
         $path = [];
-        while($dir != '' && $dir != '.'){
+        while ($dir != '' && $dir != '.') {
             $path[] = [
                 'name' => self::basename($dir),
                 'path' => $this->data['name'] . '/' . $dir
@@ -121,41 +143,32 @@ class Book{
         return $path;
     }
 
-    public function get_list(){
+    public function get_list() {
         $dir = $this->cur_dir;
-        if($dir != ''){
+        if ($dir != '') {
             $dir .= '/';
         }
 
         $path = $this->path . 'data/' . $dir;
-
-        $path = $this->tofs($path);
-
-        $list = FW\File::ls($path);
-
-        foreach ($list as $k => $v){
-            $list[$k]['name'] = $this->fromfs($v['name']);
-        }
+        $list = FW\File::ls($path, $this->fsencoding);
 
         usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
         $pages = [];
         $dirs = [];
-        foreach($list as $v){
-            if($v['dir'] === true){
+        foreach ($list as $v) {
+            if ($v['dir'] === true) {
                 $dirs[] = [
                     'name' => $v['name'],
                     'path' => $this->data['name'] . '/' . $dir . $v['name'],
                 ];
-            }
-            else{
-                if(strlen($v['name']) > 3 && substr($v['name'], -3) === '.md'){
+            } else {
+                if (strlen($v['name']) > 3 && substr($v['name'], -3) === '.md') {
                     $page = substr($v['name'], 0, strlen($v['name']) - 3);
                     $pages[] = [
                         'name' => $page,
                         'path' => $this->data['name'] . '/' . $dir . $page,
                     ];
                 }
-
             }
         }
         return [
@@ -164,28 +177,21 @@ class Book{
         ];
     }
 
-    public function get_siblings($page){
-        $page = self::format_page($page);
+    public function get_siblings($page) {
         $json = [];
-        if($page !== ''){
+        if ($page !== '') {
             $parent = self::dirname($page);
-            if($parent != ''){
+            if ($parent != '') {
                 $parent .= '/';
             }
 
             $path = $this->path . 'data/' . $parent;
-            $path = $this->tofs($path);
-
-            $list = FW\File::ls($path);
-
-            foreach ($list as $k => $v){
-                $list[$k]['name'] = $this->fromfs($v['name']);
-            }
+            $list = FW\File::ls($path, $this->fsencoding);
 
             usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
             $dirs = [];
-            foreach($list as $v){
-                if($v['dir'] === true){
+            foreach ($list as $v) {
+                if ($v['dir'] === true) {
                     $dirs[] = [
                         'name' => $v['name'],
                         'path' => $this->data['name'] . '/' . $parent . $v['name'],
@@ -197,40 +203,53 @@ class Book{
         echo \Zend\Json\Json::encode($json);
     }
 
-    public function read_file($file){
-        $file = self::format_page($file);
-        if($file === ''){
+    public function read_file($file) {
+        if ($file === '') {
             return true;
         }
         $path = $this->path . 'file/' . $file;
-        $path = $this->tofs($path);
-        if(file_exists($path)){
-            $fi = new \finfo(FILEINFO_MIME_TYPE);
-            $mime_type = $fi->file($path);
-            header('Content-Type: '. $mime_type);
-            readfile($path);
-        }
-        return true;
+        FW\File::readfile($path, $this->fsencoding);
     }
 
-    public static function comp_pagefirst($a, $b){
-        if($a['dir'] == $b['dir']){
-            return strcmp($a['name'], $b['name']);
+    public static function ajax_siblings($args) {
+        $matches = [];
+        if (!preg_match('/^([^\/]*)(\/(.*))?$/', $args, $matches)) {
+            die();
         }
-        elseif($a['dir'] === true){
+        $book = strval($matches[1]);
+        $page = '';
+        if (isset($matches[3])) {
+            $page = strval($matches[3]);
+        }
+        $books = Book::get_booklist();
+        try {
+            if (!isset($books[$book])) {
+                die();
+            }
+            $book_obj = new Book($books[$book]['path']);
+            $book_obj->get_siblings($page);
+        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
+            Book::disable_book($book);
+            die();
+        }
+    }
+
+    public static function comp_pagefirst($a, $b) {
+        if ($a['dir'] == $b['dir']) {
+            return strcmp($a['name'], $b['name']);
+        } elseif ($a['dir'] === true) {
+            return 1;
+        } else {
             return -1;
         }
-        else{
-            return 1;
-        }
     }
 
-    public static function get_booklist($type = self::Type_All){
+    public static function get_booklist($type = self::Type_All) {
         $books = Info::get('books', []);
-        if($type == self::Type_Enable){
+        if ($type == self::Type_Enable) {
             $ret = [];
-            foreach($books as $k => $v){
-                if(!isset($v['disable']) || $v['disable'] != true){
+            foreach ($books as $k => $v) {
+                if (!isset($v['disable']) || $v['disable'] != true) {
                     $ret[$k] = $v;
                 }
             }
@@ -239,9 +258,9 @@ class Book{
         return $books;
     }
 
-    public static function disable_book($name){
+    public static function disable_book($name) {
         $books = Info::get('books', []);
-        if(isset($books[$name])){
+        if (isset($books[$name])) {
             $books[$name]['disable'] = true;
         }
         Info::set('books', $books);
@@ -249,10 +268,10 @@ class Book{
         return true;
     }
 
-    public static function enable_book($name){
+    public static function enable_book($name) {
         $books = Info::get('books', []);
-        if(isset($books[$name])){
-            if(isset($books[$name]['disable'])){
+        if (isset($books[$name])) {
+            if (isset($books[$name]['disable'])) {
                 unset($books[$name]['disable']);
             }
         }
@@ -261,55 +280,34 @@ class Book{
         return true;
     }
 
-    public static function format_page($page){
-        if(strlen($page) > 0 && $page[0] == '/'){
-            $page = substr($page, 1);
-        }
-        $page = str_replace('/../', '/', $page);
-        return $page;
-    }
-
-    public static function dirname($page){
+    public static function dirname($page) {
         $page = \dirname($page);
-        if($page == '.'){
+        if ($page == '.') {
             $page = '';
         }
         return $page;
     }
 
-    public static function basename($page){
+    public static function basename($page) {
         $pos = strrpos($page, '/');
-        if($pos === false){
+        if ($pos === false) {
             return $page;
         }
         return substr($page, $pos + 1);
     }
 
-    public function fromfs($str){
-        if($this->encoding != $this->fsencoding){
-            $str = iconv($this->fsencoding, $this->encoding, $str);
-        }
-        return $str;
-    }
-
-    public function tofs($str){
-        if($this->encoding != $this->fsencoding){
-            $str = iconv($this->encoding, $this->fsencoding, $str);
-        }
-        return $str;
-    }
-
     /*
      * 笔记本的内部引用链接，格式[[方法:笔记本名//目录路径//文件路径]]
      */
-    public function parse_link($link){
+
+    public function parse_link($link) {
         $matches = [];
-        if(!preg_match('/^\[\[(F|V):(([^\/]*)\/\/)?([^\]]*)\]\]$/i', $link, $matches)){
+        if (!preg_match('/^\[\[(F|V):(([^\/]*)\/\/)?([^\]]*)\]\]$/i', $link, $matches)) {
             return $link;
         }
 
         $method = $matches[1];
-        if(!isset(self::$link_method[$method])){
+        if (!isset(self::$link_method[$method])) {
             return $link;
         }
         $bookname = $matches[3] == '' ? $this->data['name'] : $matches[3];
@@ -318,92 +316,23 @@ class Book{
         return '/' . self::$link_method[$method] . '/' . $bookname . '/' . $page;
     }
 
-    protected function show_page($page){
-        if($this->show_md($page)){//先尝试显示指定名称的页面
-            return true;
-        }
-        //如果页面不存在，则尝试显示指定名称的目录
-        $file = $this->path . 'data/' . $page;
-        $file = $this->tofs($file);
-
-        if(is_dir($file)){
-            $sub = $this->get_first_page('data/' . $page);
-            if($sub != ''){//目录中存在页面就显示
-                FW\Server::redirect('/view/' . $this->data['name'] . '/' . $page . '/' . $sub);
-            }
-            //不存在则显示空模板
-            $this->cur_dir = $page;
-            FW\Tpl::display('/view/empty', $this);
-            return true;
-        }
-        //如果没有目录，则回退到上一级目录
-        FW\Server::redirect('/view/' . $this->data['name'] . '/' . dirname($page));
-    }
-
-    protected function show_md($page){
-        $src = $this->path . 'data/' . $page . '.md';
-        $src = $this->tofs($src);
-        if(!is_file($src)){
-            return false;
-        }
-        $dest = $this->path . 'html/' . $page . '.html';
-        $dest = $this->tofs($dest);
-        $srctime = filemtime($src);
-        $desttime = 0;
-        if(file_exists($dest)){
-            $desttime = filemtime($dest);
-        }
-        //只在更新后重新编译
-        if(self::$always_compile == 1 || $desttime == 0 || $desttime <= $srctime){
-            $str = file_get_contents($src);
-
-            $transform = new \Michelf\MarkdownExtra();
-            $transform->url_filter_func = [$this, 'parse_link'];
-            $str = $transform->transform($str);
-            FW\File::mkdir(dirname($dest));
-            file_put_contents($dest, $str);
-        }
-        $this->compiled = true;
-        $this->cur_page = $page;
-        $this->cur_dir = dirname($page);
-        if($this->cur_dir == '.'){
-            $this->cur_dir = '';
-        }
-        FW\Tpl::display('/view/page', $this);
-        $this->data['last_page'] = $this->cur_page;
-        $this->save();
-        Info::set('last_page', $this->data['name'] . '/' . $this->cur_page);
-        Info::save();
-        return true;
-    }
-
-    protected function get_first_page($path = 'data/'){
-
+    /**
+     * 找到目录中的第一个页面，如果不存在页面则返回第一个目录，如果目录也不存在，则返回空字符串
+     *
+     * @param string $path 查找的目录
+     * @return string
+     */
+    protected function get_first_page($path = 'data/') {
         $path = $this->path . $path;
-        $path = $this->tofs($path);
-
-        $list = FW\File::ls($path);
-
-        foreach ($list as $k => $v){
-            $list[$k]['name'] = $this->fromfs($v['name']);
-        }
-
+        $list = FW\File::ls($path, $this->fsencoding);
         usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
-        $dir = '';
-        $page = '';
-        foreach($list as $v){
-            if($v['dir'] === true){
-                $dir = ($dir === ''? $v['name'] : $dir);
-            }
-            else{
-                if($page === '' && strlen($v['name']) > 3
-                        && substr($v['name'], -3) === '.md'){
-                    $page = substr($v['name'], 0, strlen($v['name']) - 3);
-                    break;
-                }
-            }
+        reset($list);
+        $v = current($list);
+        if ($v['dir']) {
+            return $v['name'];
+        } else {
+            return substr($v['name'], 0, -3);
         }
-        return ($page === '' ? $dir : $page);
     }
 
 }
