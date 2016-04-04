@@ -30,16 +30,32 @@ class BookTest extends \PHPUnit_Framework_TestCase {
 
     public function test_parse_link() {
         $book = new Webnote\Book(dirname(__dir__) . '/tests_data/test');
-        $book->set_path("/测试文件");
+        $book->set_path("测试文件");
         $hash = [
             '[[F:1.jpg]]' => '/file/测试/1.jpg',
-            '[[F:工作//1.jpg]]' => '/file/工作/1.jpg',
+            '[[F:目录//1.jpg]]' => '/file/测试/目录/1.jpg',
+            '[[F:笔记//目录//1.jpg]]' => '/file/笔记/目录/1.jpg',
             '[[V:1.jpg]]' => '/view/测试/1.jpg',
-            '[[V:工作//1.jpg]]' => '/view/工作/1.jpg',
+            '[[V:目录//1.jpg]]' => '/view/测试/目录/1.jpg',
+            '[[V:笔记//目录//1.jpg]]' => '/view/笔记/目录/1.jpg',
         ];
         foreach ($hash as $k => $v) {
             $ret = $book->parse_link($k);
-            $this->assertEquals($ret, $v);
+            $this->assertEquals($v, $ret);
+        }
+
+        $book->set_path("测试目录/目录文件");
+        $hash = [
+            '[[F:1.jpg]]' => '/file/测试/测试目录/1.jpg',
+            '[[F:目录//1.jpg]]' => '/file/测试/目录/1.jpg',
+            '[[F:笔记//目录//1.jpg]]' => '/file/笔记/目录/1.jpg',
+            '[[V:1.jpg]]' => '/view/测试/测试目录/1.jpg',
+            '[[V:目录//1.jpg]]' => '/view/测试/目录/1.jpg',
+            '[[V:笔记//目录//1.jpg]]' => '/view/笔记/目录/1.jpg',
+        ];
+        foreach ($hash as $k => $v) {
+            $ret = $book->parse_link($k);
+            $this->assertEquals($v, $ret);
         }
     }
 

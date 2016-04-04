@@ -302,18 +302,28 @@ class Book {
 
     public function parse_link($link) {
         $matches = [];
-        if (!preg_match('/^\[\[(F|V):(([^\/]*)\/\/)?([^\]]*)\]\]$/i', $link, $matches)) {
+        if (!preg_match('/^\[\[(F|V):((([^\/]*)\/\/)?(.*)\/\/)?([^\]]*)\]\]$/i', $link, $matches)) {
             return $link;
         }
+
+        print_r($matches);
 
         $method = $matches[1];
         if (!isset(self::$link_method[$method])) {
             return $link;
         }
-        $bookname = $matches[3] == '' ? $this->data['name'] : $matches[3];
-        $page = $matches[4];
 
-        return '/' . self::$link_method[$method] . '/' . $bookname . '/' . $page;
+        $bookname = $matches[4] == '' ? $this->data['name'] : $matches[4];
+        $path = '/' . self::$link_method[$method] . '/' . $bookname;
+
+        $dir = $matches[5] == '' ? $this->cur_dir : $matches[5];
+        if ($dir != '') {
+            $path .= '/' . $dir;
+        }
+
+        $page = $matches[6];
+
+        return $path . '/' . $page;
     }
 
     /**
