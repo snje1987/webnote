@@ -150,7 +150,7 @@ class Book {
         }
 
         $path = $this->path . 'data/' . $dir;
-        $list = FW\File::ls($path, $this->fsencoding);
+        $list = FW\File::ls($path, '.md', false, $this->fsencoding);
 
         usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
         $pages = [];
@@ -186,7 +186,7 @@ class Book {
             }
 
             $path = $this->path . 'data/' . $parent;
-            $list = FW\File::ls($path, $this->fsencoding);
+            $list = FW\File::ls($path, '.md', false, $this->fsencoding);
 
             usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
             $dirs = [];
@@ -306,8 +306,6 @@ class Book {
             return $link;
         }
 
-        print_r($matches);
-
         $method = $matches[1];
         if (!isset(self::$link_method[$method])) {
             return $link;
@@ -334,7 +332,7 @@ class Book {
      */
     protected function get_first_page($path = 'data/') {
         $path = $this->path . $path;
-        $list = FW\File::ls($path, $this->fsencoding);
+        $list = FW\File::ls($path, '.md', false, $this->fsencoding);
         usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
         reset($list);
         $v = current($list);
