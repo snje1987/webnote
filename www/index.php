@@ -5,7 +5,10 @@ use Org\Snje\Webnote as WN;
 
 require_once '../vendor/autoload.php';
 
-$app = new FW\System();
+$app = new FW\System([
+    '/src/default.php',
+    '/config.php'
+]);
 
 $app->reg_call('/^\/view\/([^\/]*)((\/.*)?)$/', function($book, $page){
     $books = Book::get_booklist();

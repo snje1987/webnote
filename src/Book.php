@@ -22,6 +22,8 @@ class Book{
     protected $encoding = '';
     protected $fsencoding = '';
 
+    public static $always_compile;
+
     protected static $link_method = [
         'F' => 'file',
         'V' => 'view',
@@ -352,7 +354,7 @@ class Book{
             $desttime = filemtime($dest);
         }
         //只在更新后重新编译
-        if($desttime == 0 || $desttime <= $srctime){
+        if(self::$always_compile == 1 || $desttime == 0 || $desttime <= $srctime){
             $str = file_get_contents($src);
 
             $transform = new \Michelf\MarkdownExtra();
@@ -405,3 +407,5 @@ class Book{
     }
 
 }
+
+Book::$always_compile = FW\Config::get('book', 'always_compile', 0);
