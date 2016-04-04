@@ -93,6 +93,7 @@ class Router {
             }
             $book_obj = new Book($books[$book]['path']);
             $book_obj->set_path($page);
+            FW\Env::set('title', $book . '/' . $page);
             if (FW\Tpl::display('/view/page', $book_obj)) {
                 Book::enable_book($book);
             }
