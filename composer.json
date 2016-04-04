@@ -11,5 +11,10 @@
         "psr-4": {
             "Org\\Snje\\Webnote\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Org\\Snje\\WebnoteTest\\": "tests/"
+        }
     }
 }
