@@ -19,6 +19,7 @@
 
 namespace Org\Snje\WebnoteTest;
 
+use Org\Snje\Minifw as FW;
 use Org\Snje\Webnote;
 
 /**
@@ -28,8 +29,14 @@ use Org\Snje\Webnote;
  */
 class BookTest extends \PHPUnit_Framework_TestCase {
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        define("WEB_ROOT", str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)));
+        new FW\System();
+    }
+
     public function test_parse_link() {
-        $book = new Webnote\Book(dirname(__dir__) . '/tests_data/test');
+        $book = new Webnote\Book(WEB_ROOT . '/tests_data/test');
         $book->set_path("测试文件");
         $hash = [
             '[[F:1.jpg]]' => '/file/测试/1.jpg',
