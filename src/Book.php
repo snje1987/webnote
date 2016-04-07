@@ -40,7 +40,7 @@ class Book {
         if ($str === false) {
             throw new FW\Exception('读取信息失败');
         }
-        $this->data = \Zend\Json\Json::decode($str, \Zend\Json\Json::TYPE_ARRAY);
+        $this->data = \json_decode($str, true);
         $this->cur_page = '';
         $this->encoding = FW\Config::get('main', 'encoding', 'utf-8');
         $this->fsencoding = FW\Config::get('main', 'fsencoding', 'utf-8');
@@ -48,10 +48,7 @@ class Book {
 
     public function save() {
         $info_file = $this->path . 'book.json';
-        $str = \Zend\Json\Json::encode($this->data);
-        if (DEBUG) {
-            $str = \Zend\Json\Json::prettyPrint($str, ["indent" => "    "]);
-        }
+        $str = \json_encode($this->data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         return FW\File::put_content($info_file, $str, $this->fsencoding);
     }
 
@@ -200,7 +197,7 @@ class Book {
             }
             $json = $dirs;
         }
-        echo \Zend\Json\Json::encode($json);
+        echo \json_encode($json, JSON_UNESCAPED_UNICODE);
     }
 
     public function read_file($file) {
