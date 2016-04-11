@@ -112,7 +112,7 @@ class Book {
             $transform = new \Michelf\MarkdownExtra();
             $transform->url_filter_func = [$this, 'parse_link'];
             $str = $transform->transform($str);
-            FW\File::mkdir(dirname($dest));
+            FW\File::mkdir(dirname($dest), $this->fsencoding);
             FW\File::put_content($dest, $str, $this->fsencoding);
         } else {
             $str = FW\File::get_content($dest, $this->fsencoding);
