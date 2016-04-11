@@ -2,7 +2,7 @@
 <phpunit bootstrap="vendor/autoload.php">
     <testsuites>
         <testsuite name="book_url">
-            <file>tests/BookTest.php</file>
+            <file>tests/Test/Book/ParseLink.php</file>
         </testsuite>
     </testsuites>
 </phpunit>

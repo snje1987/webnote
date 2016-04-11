@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\WebnoteTest;
+namespace Org\Snje\WebnoteTest\Test\Book;
 
-use Org\Snje\Minifw as FW;
+use Org\Snje\WebnoteTest;
 use Org\Snje\Webnote;
 
 /**
@@ -27,16 +27,15 @@ use Org\Snje\Webnote;
  *
  * @author Yang Ming <yangming0116@163.com>
  */
-class BookTest extends \PHPUnit_Framework_TestCase {
+class ParseLink extends \PHPUnit_Framework_TestCase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
-        define("WEB_ROOT", str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)));
-        new FW\System();
+        WebnoteTest\Common::set_env();
     }
 
     public function test_parse_link() {
-        $book = new Webnote\Book(WEB_ROOT . '/tests_data/test');
+        $book = new Webnote\Book(WEB_ROOT . '/tests/data/test1');
         $book->set_path("测试文件");
         $hash = [
             '[[F:1.jpg]]' => '/file/测试/1.jpg',
