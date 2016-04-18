@@ -1,4 +1,5 @@
 <?php
+
 //是否开启调试模式
 $cfg['debug']['debug'] = 0;
 //session域
