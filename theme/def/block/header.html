@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title><{ FW\Env::get('title')}></title>
+        <title><{=FW\Env::get('title')}></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="stylesheet" type="text/css" href="/style/common.css" />
         <script type="text/javascript" src="/script/common.js"></script>
@@ -13,7 +13,7 @@
         <div id="main" class="clearfix">
             <ul id="lbar">
                 <{foreach $books $k $v}>
-                <li><a href="/view/<{ $k}>"><{ $k}></a></li>
+                <li><a href="/view/<{=$k}>"><{=$k}></a></li>
                 <{/foreach}>
                 <li><a href="/open/">打开</a></li>
             </ul>
