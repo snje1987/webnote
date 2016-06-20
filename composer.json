@@ -1,7 +1,7 @@
 {
     "require": {
         "snje1987/minifw": "master@dev",
-        "michelf/php-markdown": "1.*",
+        "snje1987/markdown": "master@dev",
         "klaussilveira/gitter": "master@dev"
     },
     "require-dev": {
