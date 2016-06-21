@@ -11,6 +11,31 @@ $cfg['book'] = [
     'always_compile' => 0,
 ];
 
+$cfg['code'] = [
+    'dot' => [
+        'path' => '',
+        'cmd' => '%p -Tsvg',
+        'callback' => function($str) {
+            $pos = strpos($str, '<svg');
+            if ($pos !== false) {
+                return substr($str, $pos);
+            }
+            return $str;
+        },
+    ],
+    'plantuml' => [
+        'path' => '',
+        'cmd' => '%p -tsvg -p',
+        'callback' => function($str) {
+            $pos = strpos($str, '<svg');
+            if ($pos !== false) {
+                return substr($str, $pos);
+            }
+            return $str;
+        },
+    ],
+];
+
 $cfg['main']['encoding'] = 'utf-8';
 $cfg['main']['db'] = '';
 $cfg['main']['theme'] = 'def';

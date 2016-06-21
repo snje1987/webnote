@@ -111,6 +111,7 @@ class Book {
             $str = FW\File::get_content($src, $this->fsencoding);
             $transform = new \Michelf\MarkdownExtra();
             $transform->url_filter_func = [$this, 'parse_link'];
+            $transform->custom_code_parser = __CLASS__ . '::parse_codebock';
             $str = $transform->transform($str);
             FW\File::mkdir(dirname($dest), $this->fsencoding);
             FW\File::put_content($dest, $str, $this->fsencoding);
@@ -319,6 +320,32 @@ class Book {
         $page = $matches[6];
 
         return $path . '/' . $page;
+    }
+
+    public static function parse_codebock($class, $code) {
+        $cfg = FW\Config::get('code', $class, []);
+        $ret = '';
+        if (is_array($cfg) && isset($cfg['cmd']) &&
+                isset($cfg['path']) && $cfg['path'] != '') {
+
+            $cmd = str_replace('%p', $cfg['path'], $cfg['cmd']);
+            $handle = proc_open($cmd, [
+                0 => ["pipe", "r"],
+                1 => ["pipe", "w"],
+                    ], $pipes, null, null);
+
+            if (is_resource($handle)) {
+                fwrite($pipes[0], $code);
+                fclose($pipes[0]);
+                $ret = stream_get_contents($pipes[1]);
+                fclose($pipes[1]);
+                proc_close($handle);
+                if (isset($cfg['callback']) && is_callable($cfg['callback'])) {
+                    $ret = call_user_func($cfg['callback'], $ret);
+                }
+            }
+        }
+        return $ret;
     }
 
     /**
