@@ -102,7 +102,7 @@ class Book {
         $dest = $this->path . 'html/' . $this->cur_dir . '/' . $this->cur_page . '.html';
         $srctime = FW\File::call('filemtime', $src, $this->fsencoding);
         $desttime = 0;
-        if (file_exists($dest)) {
+        if (FW\File::call('file_exists', $dest, $this->fsencoding)) {
             $desttime = FW\File::call('filemtime', $dest, $this->fsencoding);
         }
         $str = '';
