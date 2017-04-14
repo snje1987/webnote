@@ -4,9 +4,5 @@
 /config.php
 /composer.lock
 /data/
-/bower_components/
-/node_modules/
 /tests_data/*/html/
-/www/*
-!/www/index.php
 *.swp
