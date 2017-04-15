@@ -7,9 +7,12 @@ use Org\Snje\Webnote as WN;
 
 require_once '../vendor/autoload.php';
 
-$app = new FW\System([
-    '/src/default.php',
-    '/config.php'
+$app = FW\System::get([
+            'web_root' => '',
+            'cfg' => [
+                '/src/default.php',
+                '/config.php'
+            ]
         ]);
 
 $app->reg_call('/^(.*)$/', [new Router(), 'dispatch']);

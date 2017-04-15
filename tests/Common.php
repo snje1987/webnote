@@ -29,8 +29,10 @@ use Org\Snje\Minifw as FW;
 class Common {
 
     public static function set_env() {
-        define("WEB_ROOT", str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)));
-        new FW\System();
+        FW\System::get([
+            'web_root' => str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)),
+            'cfg' => ['/config.php'],
+        ]);
     }
 
 }
