@@ -27,7 +27,7 @@ use Org\Snje\Webnote;
  *
  * @author Yang Ming <yangming0116@163.com>
  */
-class ParseLink extends \PHPUnit_Framework_TestCase {
+class ParseLinkTest extends \PHPUnit_Framework_TestCase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();

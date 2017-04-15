@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="vendor/autoload.php">
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+            <exclude>
+                <file>src/defaults.php</file>
+            </exclude>
+        </whitelist>
+    </filter>
     <testsuites>
-        <testsuite name="book_url">
-            <file>tests/Test/Book/ParseLink.php</file>
+        <testsuite name="all">
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
+
