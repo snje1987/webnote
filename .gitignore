@@ -6,3 +6,4 @@
 /data/
 /tests_data/*/html/
 *.swp
+/.well-known/
