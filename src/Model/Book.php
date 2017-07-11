@@ -123,22 +123,26 @@ class Book {
         return $str;
     }
 
-    public function get_path() {
+    public function get_book_name() {
+        return $this->data['name'];
+    }
+
+    public function get_cur_page() {
+        return $this->cur_page;
+    }
+
+    public function get_breadcrumb() {
         $dir = $this->cur_dir;
-        $path = [];
+        $data = [];
         while ($dir != '' && $dir != '.') {
-            $path[] = [
-                'name' => self::basename($dir),
-                'path' => $this->data['name'] . '/' . $dir
+            $data[self::basename($dir)] = [
+                'path' => $this->data['name'] . '/' . $dir,
             ];
             $dir = dirname($dir);
         }
-        $path[] = [
-            'name' => $this->data['name'],
-            'path' => $this->data['name']
-        ];
-        $path = array_reverse($path);
-        return $path;
+        $data = array_reverse($data);
+        //print_r($data);
+        return $data;
     }
 
     public function get_list() {
@@ -176,7 +180,7 @@ class Book {
     }
 
     public function get_siblings($page) {
-        $json = [];
+        $ret = [];
         if ($page !== '') {
             $parent = self::dirname($page);
             if ($parent != '') {
@@ -184,21 +188,18 @@ class Book {
             }
 
             $path = $this->path . 'data/' . $parent;
-            $list = FW\File::ls($path, '.md', false, $this->fsencoding);
+            $list = FW\File::ls($path, '', false, $this->fsencoding);
 
             usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
-            $dirs = [];
             foreach ($list as $v) {
                 if ($v['dir'] === true) {
-                    $dirs[] = [
-                        'name' => $v['name'],
+                    $ret[$v['name']] = [
                         'path' => $this->data['name'] . '/' . $parent . $v['name'],
                     ];
                 }
             }
-            $json = $dirs;
         }
-        echo \json_encode($json, JSON_UNESCAPED_UNICODE);
+        return $ret;
     }
 
     public function read_file($file) {

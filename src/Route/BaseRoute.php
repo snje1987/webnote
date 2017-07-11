@@ -75,6 +75,9 @@ abstract class BaseRoute {
     }
 
     protected function prev() {
+        $system_obj = Site\Model\System::get();
+        FW\Tpl::assign('books', $system_obj->get_booklist());
+        FW\Tpl::assign('title', $system_obj->title);
         $auth = FW\Config::get('main', 'auth', true);
         if (!$auth) {
             return true;
@@ -83,12 +86,11 @@ abstract class BaseRoute {
                 $_SESSION[Site\Model\System::SESSION_AUTH_KEY] == true) {
             return true;
         }
-        $system_obj = Site\Model\System::get();
+
         if (strlen($system_obj->password) == 0) {
             FW\Server::redirect('/system/setpwd');
         }
         FW\Server::redirect('/system/login');
-        FW\Tpl::assign('title', $system_obj->title);
     }
 
 }

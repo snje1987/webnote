@@ -74,12 +74,11 @@ class Book extends BaseRoute {
                 FW\Server::redirect('/');
             }
             $book_obj = new Site\Model\Book($books[$book]['path']);
-            //die($book);
             $book_obj->set_path($page);
             FW\Tpl::prepend('title', $book . '/' . $page . '-');
-            if (FW\Tpl::display('/book/view', $book_obj)) {
-                $system_obj->enable_book($book);
-            }
+            FW\Tpl::assign('breadcrumb', $book_obj->get_breadcrumb());
+            $system_obj->enable_book($book);
+            FW\Tpl::display('/book/view', $book_obj);
         } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
             $system_obj->disable_book($book);
             FW\Server::redirect('/');
