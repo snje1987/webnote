@@ -156,7 +156,7 @@
             var pop;
             var load_info = function () {
                 var path = link.attr('href');
-                var path = path.replace(/\/view\//, '/ajax/book/siblings-');
+                var path = path.replace(/\/view\//, '/ajax/siblings-');
                 var data;
                 $.ajax({
                     url: path,
@@ -189,7 +189,7 @@
                 for (var i = 0; i < len; i++) {
                     if (data[i]['name'] !== link.html()) {
                         var a = $('<a />');
-                        a.attr('href', '/view/' + data[i]['path']).html(data[i]['name']);
+                        a.attr('href', '/book/view/' + data[i]['path']).html(data[i]['name']);
                         a.css({
                             'display': 'block',
                             'color': 'white',

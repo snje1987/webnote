@@ -7,6 +7,10 @@ $cfg['main']['domain'] = '.webnote.snje.org';
 //文件系统的编码
 $cfg['main']['fsencoding'] = 'utf-8';
 
+$cfg['main']['auth'] = false;
+
+$cfg['main']['err_404'] = '/www/static/error/404.html';
+
 $cfg['book'] = [
     'always_compile' => 0,
 ];

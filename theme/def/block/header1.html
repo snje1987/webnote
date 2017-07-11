@@ -1,5 +1,6 @@
 <{use Org\Snje\Minifw as FW}>
 <{use Org\Snje\Webnote as WN}>
+<{$books = WN\Book::get_booklist()}>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -14,11 +15,4 @@
     </head>
     <body>
         <div id="main" class="clearfix">
-            <ul id="lbar">
-                <{foreach $books $k $v}>
-                <li><a href="/book/view/<{=$k}>"><{=$k}></a></li>
-                <{/foreach}>
-                <li><a href="/book/open/">打开</a></li>
-            </ul>
-            <div id="rcontent">
 

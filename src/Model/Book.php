@@ -8,9 +8,10 @@
  * @Description
  */
 
-namespace Org\Snje\Webnote;
+namespace Org\Snje\Webnote\Model;
 
 use Org\Snje\Minifw as FW;
+use Org\Snje\Webnote as Site;
 
 class Book {
 
@@ -60,18 +61,18 @@ class Book {
             } else if (FW\File::call('is_dir', $this->path . 'data/' . $path, $this->fsencoding)) {//存在相应目录
                 $page = $this->get_first_page('data/' . $path);
                 if ($page != '') {//目录中存在页面就显示
-                    FW\Server::redirect('/view/' . $this->data['name'] . '/' . $path . '/' . $page);
+                    FW\Server::redirect('/book/view/' . $this->data['name'] . '/' . $path . '/' . $page);
                 }
                 //不存在则显示空模板
                 $this->cur_dir = $path;
                 $this->cur_page = '';
             } else {//文件不存在
-                FW\Server::redirect('/view/' . $this->data['name'] . '/' . self::dirname($path));
+                FW\Server::redirect('/book/view/' . $this->data['name'] . '/' . self::dirname($path));
             }
         } else {
             $path = $this->get_first_page();
             if ($path != '') {
-                FW\Server::redirect('/view/' . $this->data['name'] . '/' . $path);
+                FW\Server::redirect('/book/view/' . $this->data['name'] . '/' . $path);
             } else {
                 $this->cur_dir = '';
                 $this->cur_page = '';
@@ -80,14 +81,9 @@ class Book {
     }
 
     public function open($post) {
-        $books = Info::get('books', []);
-        if (isset($books[$this->data['name']])) {
-            throw new FW\Exception('笔记本已存在');
-        }
-        $books[$this->data['name']] = ['path' => $this->path];
-        Info::set('books', $books);
-        Info::save();
-        return ['returl' => '/view/' . $this->data['name']];
+        $system_obj = System::get();
+        $system_obj->add_book($this->data['name'], $this->path);
+        return ['returl' => '/book/view/' . $this->data['name']];
     }
 
     public function get_content() {
@@ -95,11 +91,15 @@ class Book {
             return '';
         }
 
-        $src = $this->path . 'data/' . $this->cur_dir . '/' . $this->cur_page . '.md';
+        if ($this->cur_dir != '') {
+            $this->cur_dir .= '/';
+        }
+
+        $src = $this->path . 'data/' . $this->cur_dir . $this->cur_page . '.md';
         if (!FW\File::call('is_file', $src, $this->fsencoding)) {
             return '';
         }
-        $dest = $this->path . 'html/' . $this->cur_dir . '/' . $this->cur_page . '.html';
+        $dest = $this->path . 'html/' . $this->cur_dir . $this->cur_page . '.html';
         $srctime = FW\File::call('filemtime', $src, $this->fsencoding);
         $desttime = 0;
         if (FW\File::call('file_exists', $dest, $this->fsencoding)) {
@@ -118,8 +118,8 @@ class Book {
         } else {
             $str = FW\File::get_content($dest, $this->fsencoding);
         }
-        Info::set('last_page', $this->data['name'] . '/' . $this->cur_page);
-        Info::save();
+        $system_obj = System::get();
+        $system_obj->set_last_page($this->data['name'] . '/' . $this->cur_dir . $this->cur_page);
         return $str;
     }
 
@@ -219,7 +219,8 @@ class Book {
         if (isset($matches[3])) {
             $page = strval($matches[3]);
         }
-        $books = Book::get_booklist();
+        $system_obj = System::get();
+        $books = $system_obj->get_booklist();
         try {
             if (!isset($books[$book])) {
                 die();
@@ -227,7 +228,7 @@ class Book {
             $book_obj = new Book($books[$book]['path']);
             $book_obj->get_siblings($page);
         } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
-            Book::disable_book($book);
+            $system_obj->disable_book($book);
             die();
         }
     }
@@ -240,42 +241,6 @@ class Book {
         } else {
             return -1;
         }
-    }
-
-    public static function get_booklist($type = self::Type_All) {
-        $books = Info::get('books', []);
-        if ($type == self::Type_Enable) {
-            $ret = [];
-            foreach ($books as $k => $v) {
-                if (!isset($v['disable']) || $v['disable'] != true) {
-                    $ret[$k] = $v;
-                }
-            }
-            $books = $ret;
-        }
-        return $books;
-    }
-
-    public static function disable_book($name) {
-        $books = Info::get('books', []);
-        if (isset($books[$name])) {
-            $books[$name]['disable'] = true;
-        }
-        Info::set('books', $books);
-        Info::save();
-        return true;
-    }
-
-    public static function enable_book($name) {
-        $books = Info::get('books', []);
-        if (isset($books[$name])) {
-            if (isset($books[$name]['disable'])) {
-                unset($books[$name]['disable']);
-            }
-        }
-        Info::set('books', $books);
-        Info::save();
-        return true;
     }
 
     public static function dirname($page) {

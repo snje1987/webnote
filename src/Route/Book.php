@@ -1,53 +1,30 @@
 <?php
 
 /**
- * @filename Router.php
+ * @filename Book.php
  * @encoding UTF-8
  * @author Yang Ming <yangming0116@163.com>
  * @datetime 2016-2-28  13:36:42
  * @Description
  */
 
-namespace Org\Snje\Webnote;
+namespace Org\Snje\Webnote\Route;
 
 use Org\Snje\Minifw as FW;
+use Org\Snje\Webnote as Site;
 
-class Router {
+class Book extends BaseRoute {
 
-    protected static $route = [
-        'open', 'file', 'view', 'ajax'
-    ];
-
-    public function __construct() {
-
-    }
-
-    public function dispatch($path) {
-        $path = urldecode($path);
-
-        $matches = [];
-        if (!preg_match('/^\/([a-z]*)\/(.*)?$/', $path, $matches)) {
-            $this->show_last_page();
-        }
-
-        $method = strval($matches[1]);
-        $args = strval($matches[2]);
-
-        if (!in_array($method, self::$route)) {
-            $this->show_last_page();
-        }
-
-        $this->$method($args);
-    }
-
-    protected function ajax($path) {
+    /**
+     * @route(prev=true)
+     */
+    private function c_ajax($path) {
         $pinfo = FW\System::path_info('/' . $path);
 
-        $class = __NAMESPACE__ . ucwords(str_replace('/', '\\', $pinfo[0]), '\\');
         $func = 'ajax_' . strval($pinfo[1]);
         $args = strval($pinfo[3]);
-        if (class_exists($class) && method_exists($class, $func)) {
-            $class::$func($args);
+        if (method_exists(Site\Model\Book::class, $func)) {
+            Site\Model\Book::$func($args);
         }
     }
 
@@ -76,9 +53,12 @@ class Router {
         }
     }
 
-    protected function view($path) {
+    /**
+     * @route(prev=true)
+     */
+    private function c_view($path) {
         $matches = [];
-        if (!preg_match('/^([^\/]*)(\/(.*))?$/', $path, $matches)) {
+        if (!preg_match('/^([^\/]+)(\/(.*))?$/', $path, $matches)) {
             $this->show_last_page();
         }
         $book = strval($matches[1]);
@@ -86,19 +66,22 @@ class Router {
         if (isset($matches[3])) {
             $page = strval($matches[3]);
         }
-        $books = Book::get_booklist();
+        $system_obj = Site\Model\System::get();
+        $books = $system_obj->books;
+        FW\Tpl::assign('books', $books);
         try {
             if (!isset($books[$book])) {
                 FW\Server::redirect('/');
             }
-            $book_obj = new Book($books[$book]['path']);
+            $book_obj = new Site\Model\Book($books[$book]['path']);
+            //die($book);
             $book_obj->set_path($page);
-            FW\Env::set('title', $book . '/' . $page);
-            if (FW\Tpl::display('/view/page', $book_obj)) {
-                Book::enable_book($book);
+            FW\Tpl::prepend('title', $book . '/' . $page . '-');
+            if (FW\Tpl::display('/book/view', $book_obj)) {
+                $system_obj->enable_book($book);
             }
         } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
-            Book::disable_book($book);
+            $system_obj->disable_book($book);
             FW\Server::redirect('/');
         }
     }
@@ -109,17 +92,17 @@ class Router {
     }
 
     protected function show_last_page() {
-        $path = Info::get('last_page', '');
+        $system_obj = Site\Model\System::get();
+        $path = $system_obj->last_page;
         if ($path != '') {
-            Info::del('last_page');
-            Info::save();
-            FW\Server::redirect('/view/' . $path);
+            $system_obj->set_last_page('');
+            FW\Server::redirect('/book/view/' . $path);
         } else {
-            $books = Book::get_booklist(Book::Type_Enable);
+            $books = $system_obj->get_booklist(false);
             if (count($books) > 0) {
-                FW\Server::redirect('/view/' . key($books));
+                FW\Server::redirect('/book/view/' . key($books));
             } else {
-                FW\Server::redirect('/open/');
+                FW\Server::redirect('/book/open/');
             }
         }
     }

@@ -127,7 +127,7 @@ img{
     display:inline-block;
     text-align:left;
 }
-.line .item input[type="text"]{
+.line .item input[type="text"],.line .item input[type="password"]{
     box-sizing: border-box;
     width:100%;
     height:20px;
