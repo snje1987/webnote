@@ -2,7 +2,8 @@
     "require": {
         "snje1987/minifw": "master@dev",
         "snje1987/markdown": "master@dev",
-        "klaussilveira/gitter": "master@dev"
+        "klaussilveira/gitter": "master@dev",
+        "twbs/bootstrap": "3.*"
     },
     "require-dev": {
         "phpunit/phpunit": "5.3.*"
@@ -16,5 +17,8 @@
         "psr-4": {
             "Org\\Snje\\WebnoteTest\\": "tests/"
         }
+    },
+    "scripts": {
+        "post-autoload-dump": "Org\\Snje\\Webnote\\Model\\Resource::copy_composer_resource"
     }
 }
