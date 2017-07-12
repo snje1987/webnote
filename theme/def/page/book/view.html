@@ -2,54 +2,58 @@
 <{use Org\Snje\Webnote as WN}>
 <{inc header}>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-xs-2">
-            <div class="btn-group btn-group-justified" role="group">
-                <{$bookname=$args->get_book_name()}>
-                <{$cur_page=$args->get_cur_page()}>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><{=$bookname}>
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <{foreach $books $k $v}>
-                        <{if $k != $bookname}>
-                        <li class="text-center"><a href="/book/view/<{=$k}>"><{=$k}></a></li>
-                        <{/if}>
+    <{$bookname=$args->get_book_name()}>
+    <{$cur_page=$args->get_cur_page()}>
+    <ol class="breadcrumb breadcrumb">
+        <{foreach $breadcrumb $k $v}>
+        <li><a data-toggle="modal" data-target="#myModal<{=$k}>" href="#"><{=$v['name']}></a></li>
+        <{/foreach}>
+    </ol>
+</div>
+<{foreach $breadcrumb $k $v}>
+<div class="modal fade bs-example-modal-lg" id="myModal<{=$k}>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel<{=$k}>">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel<{=$k}>">请选择</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <{if $v['type'] == 'book'}>
+                        <{foreach $v['siblings'] $k2 $v2}>
+                            <{if $k2 == $v['name']}>
+                            <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k2}>"><{=$k2}></a></li>
+                            <{else}>
+                            <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k2}>"><{=$k2}></a></li>
+                            <{/if}>
                         <{/foreach}>
-                    </ul>
-                </div>
+                    <{else}>
+                        <{foreach $v['siblings']['dirs'] $v2}>
+                            <{if $v['name'] == $v2['name']}>
+                            <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v2['path']}>"><{=$v2['name']}></a></li>
+                            <{else}>
+                            <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v2['path']}>"><{=$v2['name']}></a></li>
+                            <{/if}>
+                        <{/foreach}>
+                        <{foreach $v['siblings']['pages'] $v2}>
+                            <{if $v['name'] == $v2['name']}>
+                            <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v2['path']}>"><{=$v2['name']}></a></li>
+                            <{else}>
+                            <li class="list-group-item list-group-item-text"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v2['path']}>"><{=$v2['name']}></a></li>
+                            <{/if}>
+                        <{/foreach}>
+                    <{/if}>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
-        <ol class="breadcrumb col-xs-10">
-            <li><a href="/book/view/<{=$bookname}>"><{=$bookname}></a></li>
-            <{foreach $breadcrumb $k $v}>
-            <li><a href="/book/view/<{=$v['path']}>"><{=$k}></a></li>
-            <{/foreach}>
-            <li><{=$cur_page}></li>
-        </ol>
     </div>
 </div>
+<{/foreach}>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-xs-2">
-            <{$list = $args->get_list()}>
-            <div class="list-group">
-                <{foreach $list['dirs'] $v}>
-                <a class="list-group-item list-group-item-info" href="/book/view/<{=$v['path']}>"><{=$v['name']}></a>
-                <{/foreach}>
-                <{foreach $list['pages'] $v}>
-                    <{if $v['name'] == $cur_page}>
-                        <a class="list-group-item active" href="/book/view/<{=$v['path']}>"><{=$v['name']}></a>
-                    <{else}>
-                        <a class="list-group-item" href="/book/view/<{=$v['path']}>"><{=$v['name']}></a>
-                    <{/if}>
-                <{/foreach}>
-            </div>
-        </div>
-        <div class="col-xs-10">
-            <div id="page"><{=$args->get_content()}></div>
-        </div>
-    </div>
+    <div id="page"><{=$args->get_content()}></div>
 </div>
 <{inc footer}>

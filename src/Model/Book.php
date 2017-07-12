@@ -135,12 +135,28 @@ class Book {
         $dir = $this->cur_dir;
         $data = [];
         while ($dir != '' && $dir != '.') {
-            $data[self::basename($dir)] = [
+            $data[] = [
+                'name' => self::basename($dir),
                 'path' => $this->data['name'] . '/' . $dir,
+                'type' => 'dir',
+                'siblings' => $this->get_siblings($dir),
             ];
             $dir = dirname($dir);
         }
+        $system_obj = System::get();
+        $data[] = [
+            'name' => $this->data['name'],
+            'path' => $this->data['name'],
+            'type' => 'book',
+            'siblings' => $system_obj->get_booklist(),
+        ];
         $data = array_reverse($data);
+        $data[] = [
+            'name' => $this->cur_page,
+            'path' => $this->cur_dir . '/' . $this->cur_page,
+            'type' => 'page',
+            'siblings' => $this->get_siblings($this->cur_dir . '/' . $this->cur_page),
+        ];
         //print_r($data);
         return $data;
     }
@@ -180,26 +196,43 @@ class Book {
     }
 
     public function get_siblings($page) {
-        $ret = [];
+        $pages = [];
+        $dirs = [];
         if ($page !== '') {
             $parent = self::dirname($page);
+            if ($parent == '/') {
+                $parent = '';
+            }
             if ($parent != '') {
                 $parent .= '/';
             }
 
             $path = $this->path . 'data/' . $parent;
-            $list = FW\File::ls($path, '', false, $this->fsencoding);
+            $list = FW\File::ls($path, '.md', false, $this->fsencoding);
 
             usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
+
             foreach ($list as $v) {
                 if ($v['dir'] === true) {
-                    $ret[$v['name']] = [
+                    $dirs[] = [
+                        'name' => $v['name'],
                         'path' => $this->data['name'] . '/' . $parent . $v['name'],
                     ];
+                } else {
+                    if (strlen($v['name']) > 3 && substr($v['name'], -3) === '.md') {
+                        $page = substr($v['name'], 0, strlen($v['name']) - 3);
+                        $pages[] = [
+                            'name' => $page,
+                            'path' => $this->data['name'] . '/' . $parent . $page,
+                        ];
+                    }
                 }
             }
         }
-        return $ret;
+        return [
+            'pages' => $pages,
+            'dirs' => $dirs,
+        ];
     }
 
     public function read_file($file) {
