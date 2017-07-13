@@ -61,7 +61,11 @@ class System extends BaseRoute {
             FW\Server::redirect('/system/setpwd');
         }
         if ($_POST) {
-            FW\Common::json_call($_POST, [$system_obj, 'login']);
+            if (isset($_POST['app']) && $_POST['app'] == 1) {
+                FW\Common::json_call($_POST, [$system_obj, 'login'], FW\Common::JSON_CALL_REDIRECT);
+            } else {
+                FW\Common::json_call($_POST, [$system_obj, 'login']);
+            }
         }
         FW\Tpl::prepend('title', '登陆系统-' . $system_obj->title);
         FW\Tpl::display('/system/login', []);
