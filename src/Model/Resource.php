@@ -28,34 +28,20 @@ use Org\Snje\Minifw as FW;
  */
 class Resource {
 
-    const COMPOSER_FILES = [
-        'twbs/bootstrap/dist/css/bootstrap-theme.min.css' =>
-        'www/static/bootstrap/css/bootstrap-theme.min.css',
-        'twbs/bootstrap/dist/css/bootstrap.min.css' =>
-        'www/static/bootstrap/css/bootstrap.min.css',
-        'twbs/bootstrap/dist/fonts/glyphicons-halflings-regular.eot' =>
-        'www/static/bootstrap/fonts/glyphicons-halflings-regular.eot',
-        'twbs/bootstrap/dist/fonts/glyphicons-halflings-regular.svg' =>
-        'www/static/bootstrap/fonts/glyphicons-halflings-regular.svg',
-        'twbs/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf' =>
-        'www/static/bootstrap/fonts/glyphicons-halflings-regular.ttf',
-        'twbs/bootstrap/dist/fonts/glyphicons-halflings-regular.woff' =>
-        'www/static/bootstrap/fonts/glyphicons-halflings-regular.woff',
-        'twbs/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2' =>
-        'www/static/bootstrap/fonts/glyphicons-halflings-regular.woff2',
-        'twbs/bootstrap/dist/js/bootstrap.min.js' =>
-        'www/static/bootstrap/js/bootstrap.min.js',
+    const COMPOSER_DIRS = [
+        'twbs/bootstrap/dist/' => 'www/static/bootstrap/',
     ];
 
     public static function copy_composer_resource() {
         define('WEB_ROOT', str_replace(DIRECTORY_SEPARATOR, '/', dirname(dirname(__DIR__))));
         $src_root = WEB_ROOT . '/vendor/';
         $dest_root = WEB_ROOT . '/';
-        foreach (self::COMPOSER_FILES as $k => $v) {
+
+        foreach (self::COMPOSER_DIRS as $k => $v) {
             $from = $src_root . $k;
             $to = $dest_root . $v;
             if (file_exists($from)) {
-                FW\File::copy($from, $to);
+                FW\File::copy_dir($from, $to);
             }
         }
     }
