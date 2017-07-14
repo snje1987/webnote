@@ -93,4 +93,11 @@ class System extends BaseRoute {
         FW\Common::json_call([], [Site\Model\System::get(), 'logout']);
     }
 
+    /**
+     * @route(prev=true)
+     */
+    private function c_clearcache($args) {
+        FW\Common::json_call([], [Site\Model\System::get(), 'clearcache']);
+    }
+
 }

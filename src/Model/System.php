@@ -93,6 +93,14 @@ class System {
         return true;
     }
 
+    public function clearcache() {
+        FW\File::clear_dir(FW\Config::get('path', 'compiled'));
+        foreach ($this->books as $name => $data) {
+            FW\File::clear_dir($data['path'] . '/html', true);
+        }
+        return true;
+    }
+
     public function set_last_page($page) {
         $this->last_page = $page;
         $this->save();
