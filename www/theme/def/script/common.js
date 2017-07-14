@@ -165,10 +165,13 @@
                     dataType: "html",
                     success: function (html) {
                         listCache[path] = html;
+                        modal.find('.modal-body').html(listCache[path]);
                     }
                 });
+            } else {
+                modal.find('.modal-body').html(listCache[path]);
             }
-            modal.find('.modal-body').html(listCache[path]);
-        })
+
+        });
     });//}}}
 })(jQuery);
