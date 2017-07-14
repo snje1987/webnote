@@ -52,6 +52,26 @@ class System {
         return $this->save();
     }
 
+    public function chpwd($post) {
+        $pwd = $post['pwd'];
+        if ($pwd == '') {
+            throw new FW\Exception('原密码不能为空');
+        }
+        if (!password_verify($pwd, $this->password)) {
+            throw new FW\Exception('原密码不正确');
+        }
+        $pwd1 = $post['pwd1'];
+        $pwd2 = $post['pwd2'];
+        if ($pwd1 == '') {
+            throw new FW\Exception('新密码不能为空');
+        }
+        if ($pwd1 != $pwd2) {
+            throw new FW\Exception('密码与确认密码不符');
+        }
+        $this->password = password_hash($pwd1, PASSWORD_DEFAULT);
+        return $this->save();
+    }
+
     public function login($post) {
         $pwd = $post['pwd'];
         if ($pwd == '') {
@@ -62,6 +82,10 @@ class System {
             return true;
         }
         throw new FW\Exception('密码不正确');
+    }
+
+    public function logout() {
+        $_SESSION[self::SESSION_AUTH_KEY] = false;
     }
 
     public function set_last_page($page) {

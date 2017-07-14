@@ -30,6 +30,21 @@ use Org\Snje\Minifw as FW;
 class System extends BaseRoute {
 
     /**
+     * @route(prev=true)
+     */
+    private function c_chpwd($args) {
+        $system_obj = Site\Model\System::get();
+        if (strlen($system_obj->password) == 0) {
+            FW\Server::redirect('/system/setpwd');
+        }
+        if ($_POST) {
+            FW\Common::json_call($_POST, [$system_obj, 'chpwd']);
+        }
+        FW\Tpl::prepend('title', '修改密码-' . $system_obj->title);
+        FW\Tpl::display('/system/chpwd', []);
+    }
+
+    /**
      * @route(prev=false)
      */
     private function c_setpwd($args) {
@@ -69,6 +84,18 @@ class System extends BaseRoute {
         }
         FW\Tpl::prepend('title', '登陆系统-' . $system_obj->title);
         FW\Tpl::display('/system/login', []);
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_logout($args) {
+        $auth = FW\Config::get('main', 'auth', true);
+        if (!$auth) {
+            FW\Server::redirect(FW\Server::referer());
+        }
+        Site\Model\System::get()->logout();
+        FW\Server::redirect('/system/login');
     }
 
 }
