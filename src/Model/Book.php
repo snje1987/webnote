@@ -127,6 +127,10 @@ class Book {
         return $this->data['name'];
     }
 
+    public function get_cur_dir() {
+        return $this->cur_dir;
+    }
+
     public function get_cur_page() {
         return $this->cur_page;
     }
@@ -138,24 +142,21 @@ class Book {
             $data[] = [
                 'name' => self::basename($dir),
                 'path' => $this->data['name'] . '/' . $dir,
-                'type' => 'dir',
-                'siblings' => $this->get_siblings($dir),
             ];
             $dir = dirname($dir);
         }
-        $system_obj = System::get();
         $data[] = [
             'name' => $this->data['name'],
             'path' => $this->data['name'],
-            'type' => 'book',
-            'siblings' => $system_obj->get_booklist(),
         ];
         $data = array_reverse($data);
+        $dir = $this->cur_dir;
+        if ($dir != '') {
+            $dir = '/' . $dir;
+        }
         $data[] = [
             'name' => $this->cur_page,
-            'path' => $this->cur_dir . '/' . $this->cur_page,
-            'type' => 'page',
-            'siblings' => $this->get_siblings($this->cur_dir . '/' . $this->cur_page),
+            'path' => $this->data['name'] . $dir . '/' . $this->cur_page,
         ];
         //print_r($data);
         return $data;
@@ -309,7 +310,7 @@ class Book {
         }
 
         $bookname = $matches[4] == '' ? $this->data['name'] : $matches[4];
-        $path = '/' . self::$link_method[$method] . '/' . $bookname;
+        $path = '/book/' . self::$link_method[$method] . '/' . $bookname;
 
         $dir = $matches[5] == '' ? $this->cur_dir : $matches[5];
         if ($dir != '') {
