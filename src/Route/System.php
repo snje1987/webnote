@@ -90,12 +90,7 @@ class System extends BaseRoute {
      * @route(prev=true)
      */
     private function c_logout($args) {
-        $auth = FW\Config::get('main', 'auth', true);
-        if (!$auth) {
-            FW\Server::redirect(FW\Server::referer());
-        }
-        Site\Model\System::get()->logout();
-        FW\Server::redirect('/system/login');
+        FW\Common::json_call([], [Site\Model\System::get(), 'logout']);
     }
 
 }

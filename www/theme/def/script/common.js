@@ -1,4 +1,51 @@
 (function ($) {
+    $.fn.ajax_link = function () {//{{{
+        $(this).each(function () {
+            var click = false;
+            var $this = $(this);
+            $this.click(function () {
+                if (click === true) {
+                    return;
+                }
+                var href = $this.attr('href');
+                var question = $this.attr('question');
+                click = true;
+                if (typeof question !== 'undefined' && question !== "") {
+                    if (!confirm(question)) {
+                        return false;
+                    }
+                }
+                $.show_poprelay();
+                $.ajax({
+                    url: href,
+                    async: true,
+                    dataType: "json",
+                    success: function (data) {
+                        click = false;
+                        if (!data) {
+                            $.hide_poprelay();
+                            alert('发生错误');
+                            return;
+                        }
+                        if (data.msg) {
+                            alert(data.msg);
+                        }
+                        if (data.returl && data.returl !== '') {
+                            window.location = data.returl;
+                        } else {
+                            location.reload();
+                        }
+                    },
+                    error: function () {
+                        click = false;
+                        $.hide_poprelay();
+                        alert('发生错误');
+                    }
+                });
+                return false;
+            });
+        });
+    };//}}}
     $.fn.fsubmit = function (options) {//{{{
         var defaults = {
             code: '',
@@ -102,6 +149,7 @@
         $('#poprelay').remove();
     };//}}}
     $(document).ready(function () {//{{{
+        $('a.ajax').ajax_link();
         $('#page pre code').each(function (i, block) {
             hljs.highlightBlock(block);
         });

@@ -85,7 +85,12 @@ class System {
     }
 
     public function logout() {
+        $auth = FW\Config::get('main', 'auth', true);
+        if (!$auth) {
+            return true;
+        }
         $_SESSION[self::SESSION_AUTH_KEY] = false;
+        return true;
     }
 
     public function set_last_page($page) {
