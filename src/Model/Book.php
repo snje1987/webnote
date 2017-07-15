@@ -38,7 +38,7 @@ class Book {
         }
         $info_file = $this->path . 'book.json';
         $str = FW\File::get_content($info_file, $this->fsencoding);
-        if ($str === false) {
+        if ($str == '') {
             throw new FW\Exception('读取信息失败');
         }
         $this->data = \json_decode($str, true);

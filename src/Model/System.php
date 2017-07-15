@@ -144,9 +144,7 @@ class System {
 
     public function enable_book($name) {
         if (isset($this->books[$name])) {
-            if (isset($this->books[$name]['disable'])) {
-                unset($this->books[$name]['disable']);
-            }
+            $this->books[$name]['disable'] = false;
         }
         $this->save();
         return true;
@@ -207,6 +205,7 @@ class System {
                 }
                 $this->books[$k] = [
                     'path' => $v['path'],
+                    'disable' => isset($v['disable']) ? $v['disable'] : false,
                 ];
             }
         }
