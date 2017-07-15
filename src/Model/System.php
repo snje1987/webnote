@@ -95,8 +95,9 @@ class System {
 
     public function clearcache() {
         FW\File::clear_dir(FW\Config::get('path', 'compiled'));
+        $fsencoding = FW\Config::get('main', 'fsencoding', 'utf-8');
         foreach ($this->books as $name => $data) {
-            FW\File::clear_dir($data['path'] . '/html', true);
+            FW\File::clear_dir($data['path'] . '/html', true, $fsencoding);
         }
         return true;
     }
