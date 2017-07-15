@@ -3,7 +3,10 @@
         "snje1987/minifw": "master@dev",
         "snje1987/markdown": "master@dev",
         "klaussilveira/gitter": "master@dev",
-        "twbs/bootstrap": "3.*"
+        "twbs/bootstrap": "3.*",
+        "components/jquery": "3.*",
+        "jquery-form/form": "4.*",
+        "components/highlightjs": "9.*"
     },
     "require-dev": {
         "phpunit/phpunit": "5.3.*"

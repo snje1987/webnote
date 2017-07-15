@@ -7,4 +7,4 @@
 /tests_data/*/html/
 *.swp
 /.well-known/
-/www/static/bootstrap/
+/www/lib/
