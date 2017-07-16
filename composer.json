@@ -1,8 +1,14 @@
 {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/snje1987/gitter"
+        }
+    ],
     "require": {
         "snje1987/minifw": "master@dev",
         "snje1987/markdown": "master@dev",
-        "klaussilveira/gitter": "master@dev",
+        "klaussilveira/gitter": "dev-master",
         "twbs/bootstrap": "3.*",
         "components/jquery": "3.*",
         "jquery-form/form": "4.*",
