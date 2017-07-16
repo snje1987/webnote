@@ -29,6 +29,7 @@ class Book {
 
     const Type_All = 0;
     const Type_Enable = 1;
+    const COUNT_PER_PAGE = 20;
 
     public function __construct($path) {
         $path = str_replace('\\', '/', $path);
@@ -123,6 +124,59 @@ class Book {
         return $str;
     }
 
+    public function get_history($page, $path) {
+        $repository = $this->get_Repository();
+        FW\Tpl::assign('data', []);
+        if ($repository === null) {
+            return;
+        }
+        $page = intval($page);
+        if ($page < 1) {
+            $page = 1;
+        }
+        $count = $repository->getTotalCommits();
+        $max_page = intval($count / self::COUNT_PER_PAGE);
+
+        if ($count % self::COUNT_PER_PAGE != 0) {
+            $max_page ++;
+        }
+        if ($page > $max_page) {
+            $page = $max_page;
+        }
+        FW\Tpl::assign('max_page', $max_page);
+        FW\Tpl::assign('page', $page);
+
+        try {
+            if ($path == '') {
+                $data = $repository->getCommits(null, ($page - 1) * self::COUNT_PER_PAGE, self::COUNT_PER_PAGE);
+            } else {
+                $data = $repository->getCommits($this->get_real_path($path), ($page - 1) * self::COUNT_PER_PAGE, self::COUNT_PER_PAGE);
+            }
+            FW\Tpl::assign('data', $data);
+        } catch (\RuntimeException $ex) {
+            return;
+        }
+    }
+
+    public function get_diff($commit_hash, $path) {
+        $repository = $this->get_Repository();
+        FW\Tpl::assign('commit_obj', null);
+        FW\Tpl::assign('file_obj', null);
+        if ($repository === null) {
+            return;
+        }
+        try {
+            $commit_obj = $repository->getCommit($commit_hash);
+            FW\Tpl::assign('commit_obj', $commit_obj);
+            if ($path != '') {
+                $file_obj = $repository->getFileChange($commit_hash, $this->get_real_path($path));
+                FW\Tpl::assign('file_obj', $file_obj);
+            }
+        } catch (\RuntimeException $ex) {
+            return;
+        }
+    }
+
     public function get_book_name() {
         return $this->data['name'];
     }
@@ -133,6 +187,17 @@ class Book {
 
     public function get_cur_page() {
         return $this->cur_page;
+    }
+
+    public function get_cur_path() {
+        $path = $this->data['name'];
+        if ($this->cur_dir != '') {
+            $path .= '/' . $this->cur_dir;
+        }
+        if ($this->cur_page != '') {
+            $path .= '/' . $this->cur_page;
+        }
+        return $path;
     }
 
     public function get_breadcrumb() {
@@ -236,36 +301,28 @@ class Book {
         ];
     }
 
+    public function get_real_path($path) {
+        return 'data/' . $path . '.md';
+    }
+
+    public function get_page_path($file, $unescape = false) {
+        if ($unescape) {
+            $file = preg_replace_callback('/\\\\([0-8]{3})/', function($matches) {
+                return chr(octdec($matches[1]));
+            }, $file);
+        }
+        if (strncmp($file, 'data', 4) === 0) {
+            return htmlspecialchars(substr(trim($file), 5, -3));
+        }
+        return htmlspecialchars($file);
+    }
+
     public function read_file($file) {
         if ($file === '') {
             return true;
         }
         $path = $this->path . 'file/' . $file;
         FW\File::readfile($path, $this->fsencoding);
-    }
-
-    public static function ajax_siblings($args) {
-        $matches = [];
-        if (!preg_match('/^([^\/]*)(\/(.*))?$/', $args, $matches)) {
-            die();
-        }
-        $book = strval($matches[1]);
-        $page = '';
-        if (isset($matches[3])) {
-            $page = strval($matches[3]);
-        }
-        $system_obj = System::get();
-        $books = $system_obj->get_booklist();
-        try {
-            if (!isset($books[$book])) {
-                die();
-            }
-            $book_obj = new Book($books[$book]['path']);
-            $book_obj->get_siblings($page);
-        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
-            $system_obj->disable_book($book);
-            die();
-        }
     }
 
     public static function comp_pagefirst($a, $b) {
@@ -364,6 +421,21 @@ class Book {
             return $v['name'];
         } else {
             return substr($v['name'], 0, -3);
+        }
+    }
+
+    /**
+     *
+     * @return \Gitter\Repository 版本库
+     */
+    protected function get_Repository() {
+        $dir = $this->path;
+        $dir = FW\File::conv_to($dir, $this->fsencoding);
+        $client = new \Gitter\Client();
+        try {
+            return $client->getRepository($dir);
+        } catch (\RuntimeException $ex) {
+            return null;
         }
     }
 

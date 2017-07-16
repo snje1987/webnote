@@ -7,9 +7,7 @@
     <ol class="breadcrumb breadcrumb">
         <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
         &nbsp;&nbsp;
-        <{foreach $breadcrumb $k $v}>
-        <li><a data-toggle="modal" data-target="#listModal" href="#" data-path="/book/list/<{=$v['path']}>"><{=$v['name']}></a></li>
-        <{/foreach}>
+        <li><a href="/">返回</a></li>
     </ol>
 </div>
 <div class="modal fade bs-example-modal-lg" id="systemMenu" tabindex="-1" role="dialog" aria-labelledby="systemMenuLabel">
@@ -21,8 +19,6 @@
             </div>
             <div class="modal-body">
                 <ul class="list-group">
-                    <li class="list-group-item list-group-item-text"><a href="/book/history/1/<{=$args->get_cur_path()}>">页面历史记录</a></li>
-                    <li class="list-group-item list-group-item-text"><a href="/book/history/1/<{=$args->get_book_name()}>">笔记历史记录</a></li>
                     <li class="list-group-item list-group-item-text"><a class="ajax" href="/system/clearcache">清空缓存</a></li>
                     <li class="list-group-item list-group-item-text"><a href="/system/chpwd">修改访问密码</a></li>
                     <li class="list-group-item list-group-item-text"><a class="ajax" href="/system/logout">退出登陆</a></li>
@@ -34,22 +30,35 @@
         </div>
     </div>
 </div>
-<div class="modal fade bs-example-modal-lg" id="listModal" tabindex="-1" role="dialog" aria-labelledby="listModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="listModalLabel">请选择</h4>
-            </div>
-            <div class="modal-body">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="container-fluid">
-    <div id="page"><{=$args->get_content()}></div>
+    <table class="table table-bordered table-hover table-condensed table-striped">
+        <tr>
+            <th>时间</th>
+            <th>HASH</th>
+            <th>说明</th>
+        </tr>
+        <{foreach $data $commit}>
+        <tr>
+            <td><{=$commit->getDate()->format('Y-m-d H:i:s')}></td>
+            <td><a href="/book/diff/<{=$commit->getHash()}>/<{=$book_name}>/<{=$page_path}>"><{=$commit->getHash()}></a></td>
+            <td><{=$commit->getMessage()}></td>
+        </tr>
+        <{/foreach}>
+    </table>
+    <nav aria-label="...">
+        <ul class="pager">
+            <{if $page <= 1}>
+            <li class="disabled"><a href="javascript:void(0);">上一页</a></li>
+            <{else}>
+            <li><a href="/book/history/<{=$page-1}>/<{=$book_name}>/<{=$page_path}>">上一页</a></li>
+            <{/if}>
+            <{if $page >= $max_page}>
+            <li class="disabled"><a href="javascript:void(0);">下一页</a></li>
+            <{else}>
+            <li><a href="/book/history/<{=$page+1}>/<{=$book_name}>/<{=$page_path}>">下一页</a></li>
+            <{/if}>
+
+        </ul>
+    </nav>
 </div>
 <{inc footer}>

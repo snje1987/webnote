@@ -1,0 +1,202 @@
+<{use Org\Snje\Minifw as FW}>
+<{use Org\Snje\Webnote as WN}>
+<{inc header}>
+<div class="container-fluid">
+    <{$bookname=$args->get_book_name()}>
+    <{$cur_page=$args->get_cur_page()}>
+    <ol class="breadcrumb breadcrumb">
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
+        &nbsp;&nbsp;
+        <li><a href="/">返回</a></li>
+    </ol>
+</div>
+<div class="modal fade bs-example-modal-lg" id="systemMenu" tabindex="-1" role="dialog" aria-labelledby="systemMenuLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="systemMenuLabel">选择您要进行的操作</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-text"><a class="ajax" href="/system/clearcache">清空缓存</a></li>
+                    <li class="list-group-item list-group-item-text"><a href="/system/chpwd">修改访问密码</a></li>
+                    <li class="list-group-item list-group-item-text"><a class="ajax" href="/system/logout">退出登陆</a></li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<{if $commit_obj != null}>
+<div class="container-fluid">
+    <table class="table table-bordered table-condensed">
+        <tr>
+            <th>HASH</th>
+            <td><{=$commit_obj->getHash()}></td>
+        </tr>
+        <tr>
+            <th>修改时间</th>
+            <td><{=$commit_obj->getDate()->format('Y-m-d H:i:s')}></td>
+        </tr>
+        <tr>
+            <th>修改信息</th>
+            <td><{=$commit_obj->getMessage()}></td>
+        </tr>
+    </table>
+</div>
+    <{if $file_obj != null}>
+    <{$diff = $file_obj[0]}>
+    <{$lines = $diff->getLines()}>
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <{if strncmp($lines[0]->getLine(),'new file mode', 13) === 0}>
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    "null"
+                    &nbsp;=>&nbsp;
+                    "<{=$args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2), true)}>"
+                </h3>
+            </div>
+            <{elseif strncmp($lines[0]->getLine(),'deleted file mode', 17) === 0}>
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    "<{=$args->get_page_path(substr(trim(substr($diff->getOld(),4),"\""),2), true)}>"
+                    &nbsp;=>&nbsp;
+                    "null"
+                </h3>
+            </div>
+            <{elseif $lines[0]->getType() == 'chunk'}>
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <{$name = $diff->getFile()}>
+                    <{if $name == ''}><{$name = $diff->getNew()}><{/if}>
+                    <{if $name == ''}><{$name = $diff->getOld()}><{/if}>
+                    "<{=$args->get_page_path(substr(trim(substr($name,4),"\""),2), true)}>"
+                </h3>
+            </div>
+            <{else}>
+            <pre>
+                <{=htmlspecialchars(print_r($diff))}>
+            </pre>
+            <{/if}>
+            <div class="panel-body">
+                <pre class="code">
+                <{foreach $lines $k $line}>
+                    <{$type = $line->getType()}>
+                    <{if $type == 'chunk'}>
+                    <p style="color:blue;"><{=htmlspecialchars($line->getLine())}></p>
+                    <{elseif $type == ''}>
+                    <p><{=$line->getLine()}></p>
+                    <{elseif $type == 'new'}>
+                    <p style="color:green;"><{=htmlspecialchars($line->getLine())}></p>
+                    <{elseif $type == 'old'}>
+                    <p style="color:red;"><{=htmlspecialchars($line->getLine())}></p>
+                    <{else}>
+                    <pre>
+                        <{=htmlspecialchars(print_r($line))}>
+                    </pre>
+                    <{/if}>
+                <{/foreach}>
+                </pre>
+            </div>
+        </div>
+    </div>
+    <{else}>
+    <{$diffs = $commit_obj->getDiffs()}>
+    <{foreach $diffs $diff}>
+        <{$lines = $diff->getLines()}>
+        <div class="container-fluid">
+            <div class="panel panel-default">
+                <{if strncmp($lines[0]->getLine(),'similarity index', 16) === 0}>
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        "<{=$args->get_page_path(trim(substr($lines[1]->getLine(),12),"\""), true)}>"
+                        &nbsp;=>&nbsp;
+                        "<{=$args->get_page_path(trim(substr($lines[2]->getLine(),10),"\""), true)}>"
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <{if count($lines) > 4}>
+                        <pre class="code">
+                        <{foreach $lines $k $line}>
+                            <{if $k >= 3}>
+                                <{$type = $line->getType()}>
+                                <{if $type == 'chunk'}>
+                                <p style="color:blue;"><{=htmlspecialchars($line->getLine())}></p>
+                                <{elseif $type == ''}>
+                                <p><{=$line->getLine()}></p>
+                                <{elseif $type == 'new'}>
+                                <p style="color:green;"><{=htmlspecialchars($line->getLine())}></p>
+                                <{elseif $type == 'old'}>
+                                <p style="color:red;"><{=htmlspecialchars($line->getLine())}></p>
+                                <{else}>
+                                <pre>
+                                    <{=htmlspecialchars(print_r($line))}>
+                                </pre>
+                                <{/if}>
+                            <{/if}>
+                        <{/foreach}>
+                        </pre>
+                    <{/if}>
+                </div>
+                <{else}>
+                    <{if strncmp($lines[0]->getLine(),'new file mode', 13) === 0}>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            "null"
+                            &nbsp;=>&nbsp;
+                            "<{=$args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2), true)}>"
+                        </h3>
+                    </div>
+                    <{elseif strncmp($lines[0]->getLine(),'deleted file mode', 17) === 0}>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            "<{=$args->get_page_path(substr(trim(substr($diff->getOld(),4),"\""),2), true)}>"
+                            &nbsp;=>&nbsp;
+                            "null"
+                        </h3>
+                    </div>
+                    <{elseif $lines[0]->getType() == 'chunk'}>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <{$name = $diff->getFile()}>
+                            <{if $name == ''}><{$name = $diff->getNew()}><{/if}>
+                            <{if $name == ''}><{$name = $diff->getOld()}><{/if}>
+                            "<{=$args->get_page_path(substr(trim(substr($name,4),"\""),2), true)}>"
+                        </h3>
+                    </div>
+                    <{else}>
+                    <pre>
+                        <{=htmlspecialchars(print_r($diff))}>
+                    </pre>
+                    <{/if}>
+                    <div class="panel-body">
+                        <pre class="code">
+                        <{foreach $lines $k $line}>
+                            <{$type = $line->getType()}>
+                            <{if $type == 'chunk'}>
+                            <p style="color:blue;"><{=htmlspecialchars($line->getLine())}></p>
+                            <{elseif $type == ''}>
+                            <p><{=$line->getLine()}></p>
+                            <{elseif $type == 'new'}>
+                            <p style="color:green;"><{=htmlspecialchars($line->getLine())}></p>
+                            <{elseif $type == 'old'}>
+                            <p style="color:red;"><{=htmlspecialchars($line->getLine())}></p>
+                            <{else}>
+                            <pre>
+                                <{=htmlspecialchars(print_r($line))}>
+                            </pre>
+                            <{/if}>
+                        <{/foreach}>
+                        </pre>
+                    </div>
+                <{/if}>
+            </div>
+        </div>
+    <{/foreach}>
+    <{/if}>
+<{/if}>
+<{inc footer}>

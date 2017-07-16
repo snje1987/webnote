@@ -111,6 +111,72 @@ class Book extends BaseRoute {
         FW\Tpl::display('/book/list', []);
     }
 
+    /**
+     * @route(prev=true)
+     */
+    private function c_history($args) {
+        $matches = [];
+        if (!preg_match('/^(\d+)\/([^\/]+)(\/(.*))?$/', $args, $matches)) {
+            $this->show_last_page();
+        }
+        $hist_page = intval($matches[1]);
+        $book_name = strval($matches[2]);
+        $page_path = '';
+        if (isset($matches[4])) {
+            $page_path = strval($matches[4]);
+        }
+        $system_obj = Site\Model\System::get();
+        $books = $system_obj->get_booklist();
+        try {
+            if (!isset($books[$book_name])) {
+                FW\Server::redirect('/');
+            }
+            $book_obj = new Site\Model\Book($books[$book_name]['path']);
+            $data = $book_obj->get_history(intval($hist_page), $page_path);
+            FW\Tpl::assign('book_name', $book_name);
+            FW\Tpl::assign('page_path', $page_path);
+            FW\Tpl::prepend('title', '[历史记录]' . $book_name . '/' . $page_path . '-');
+            $system_obj->enable_book($book_name);
+            FW\Tpl::display('/book/history', $book_obj);
+        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
+            $system_obj->disable_book($book_name);
+            FW\Server::redirect('/');
+        }
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_diff($args) {
+        $matches = [];
+        if (!preg_match('/^([0-9a-f]+)\/([^\/]+)(\/(.*))?$/', $args, $matches)) {
+            $this->show_last_page();
+        }
+        $commit_hash = strval($matches[1]);
+        $book_name = strval($matches[2]);
+        $page_path = '';
+        if (isset($matches[4])) {
+            $page_path = strval($matches[4]);
+        }
+        $system_obj = Site\Model\System::get();
+        $books = $system_obj->get_booklist();
+        try {
+            if (!isset($books[$book_name])) {
+                FW\Server::redirect('/');
+            }
+            $book_obj = new Site\Model\Book($books[$book_name]['path']);
+            $data = $book_obj->get_diff($commit_hash, $page_path);
+            FW\Tpl::assign('book_name', $book_name);
+            FW\Tpl::assign('page_path', $page_path);
+            FW\Tpl::prepend('title', '[查询修改]' . $book_name . '/' . $page_path . '-');
+            $system_obj->enable_book($book_name);
+            FW\Tpl::display('/book/diff', $book_obj);
+        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
+            $system_obj->disable_book($book_name);
+            FW\Server::redirect('/');
+        }
+    }
+
     private function path_info($path) {
         $matches = [];
         if (!preg_match('/^([^\/]+)(\/(.*))?$/', $path, $matches)) {
