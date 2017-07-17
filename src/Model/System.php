@@ -36,6 +36,8 @@ class System {
     private $books;
     private $data_path;
     private $title;
+    private $git_name;
+    private $git_email;
 
     const SESSION_AUTH_KEY = 'auth';
 
@@ -159,6 +161,8 @@ class System {
         $data['last_page'] = $this->last_page;
         $data['password'] = $this->password;
         $data['title'] = $this->title;
+        $data['git_name'] = $this->git_name;
+        $data['git_email'] = $this->git_email;
         $str = \json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         FW\File::mkdir(dirname($this->data_path));
         return file_put_contents($this->data_path, $str);
@@ -196,6 +200,16 @@ class System {
             $this->title = $data['title'];
         } else {
             $this->title = '我的笔记';
+        }
+        if (isset($data['git_name'])) {
+            $this->git_name = $data['git_name'];
+        } else {
+            $this->git_name = '';
+        }
+        if (isset($data['git_email'])) {
+            $this->git_email = $data['git_email'];
+        } else {
+            $this->git_email = '';
         }
         $this->books = [];
         if (isset($data['books']) && is_array([$data['books']])) {

@@ -50,10 +50,11 @@
             <{elseif $lines[0]->getType() == 'chunk'}>
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    <{$name = $diff->getFile()}>
-                    <{if $name == ''}><{$name = $diff->getNew()}><{/if}>
-                    <{if $name == ''}><{$name = $diff->getOld()}><{/if}>
-                    "<{=$args->get_page_path(substr(trim(substr($name,4),"\""),2))}>"
+                    <{$name = $args->get_page_path(trim($diff->getFile()))}>
+                    <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}><{/if}>
+                    <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getOld,4),"\""),2))}><{/if}>
+                    <span class="label label-primary">修改</span>
+                    <span class="label label-default"><{=$name}></span>
                 </h3>
             </div>
             <{else}>

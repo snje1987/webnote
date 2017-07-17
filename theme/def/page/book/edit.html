@@ -1,0 +1,44 @@
+<{use Org\Snje\Minifw as FW}>
+<{use Org\Snje\Webnote as WN}>
+<{inc header}>
+<div class="container-fluid">
+    <{$bookname=$args->get_book_name()}>
+    <{$cur_page=$args->get_cur_page()}>
+    <ol class="breadcrumb breadcrumb">
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
+        &nbsp;&nbsp;
+        <{foreach $breadcrumb $k $v}>
+        <li><a data-toggle="modal" data-target="#listModal" href="#" data-path="/book/list/<{=$v['path']}>"><{=$v['name']}></a></li>
+        <{/foreach}>
+    </ol>
+</div>
+<{inc system_menu $args}>
+<form class="fsubmit" action="/book/edit/" method="post" enctype="multipart/form-data" role="form">
+<div class="container-fluid">
+    <div id="editor">
+        <textarea name="content" class="form-control" rows="20"><{=htmlspecialchars($args->get_raw())}></textarea>
+        <br />
+        <input type="text" class="form-control" name="msg" placeholder="请输入修改说明"/>
+        <br />
+        <button type="submit" class="btn btn-success btn-block">提交修改</button>
+        <input type="hidden" name="page" value="<{=$args->get_cur_path()}>" />
+        <input type="hidden" name="returl" value="<{=FW\Server::referer()}>" />
+    </div>
+</div>
+ </form>
+<script type="text/javascript">
+(function($){
+    $(document).ready(function(){
+        $('.fsubmit').fsubmit({
+            'check':function(){
+                if($('input[name="msg"]').val() === ''){
+                    alert('修改说明不能为空');
+                    return false;
+                }
+                return true;
+            }
+        });
+    });
+})(jQuery);
+</script>
+<{inc footer}>

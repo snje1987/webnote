@@ -126,6 +126,79 @@ class Book {
         return $str;
     }
 
+    public function get_raw() {
+        if ($this->cur_page == '') {
+            return '';
+        }
+
+        if ($this->cur_dir != '') {
+            $this->cur_dir .= '/';
+        }
+
+        $src = $this->path . 'data/' . $this->cur_dir . $this->cur_page . '.md';
+        if (!FW\File::call('is_file', $src, $this->fsencoding)) {
+            return '';
+        }
+        $str = FW\File::get_content($src, $this->fsencoding);
+        return $str;
+    }
+
+    public function commit_change($content, $msg) {
+        if ($this->cur_page == '') {
+            return false;
+        }
+
+        if ($this->cur_dir != '') {
+            $this->cur_dir .= '/';
+        }
+
+        $path = $this->path . 'data/' . $this->cur_dir . $this->cur_page . '.md';
+        if (!FW\File::call('is_file', $path, $this->fsencoding)) {
+            return false;
+        }
+
+        $content = str_replace("\r", '', $content);
+        if (substr($content, -1, 1) != "\n") {
+            $content .= "\n";
+        }
+
+        if (!FW\File::put_content($path, $content, $this->fsencoding)) {
+            return false;
+        }
+        $repository = $this->get_Repository();
+        if ($repository == null) {
+            return false;
+        }
+        try {
+            $repository->addAll();
+            $repository->commit($msg);
+            //$repository->push("origin", "master");
+        } catch (\RuntimeException $ex) {
+            $repository->reset();
+            throw new FW\Exception($ex->getMessage());
+        }
+        return true;
+    }
+
+    public function run_cmd($cmd) {
+        $repository = $this->get_Repository();
+        if ($repository == null) {
+            return false;
+        }
+        try {
+            if ($cmd == 'push') {
+                $repository->push("origin", "master");
+            }
+            else {
+                $repository->pull("origin", "master");
+            }
+        } catch (\RuntimeException $ex) {
+            $repository->reset();
+            throw new FW\Exception($ex->getMessage());
+        }
+        return true;
+    }
+
     public function get_history($page, $path) {
         $repository = $this->get_Repository();
         FW\Tpl::assign('data', []);
@@ -381,6 +454,81 @@ class Book {
         return $path . '/' . $page;
     }
 
+    public static function edit_page($post) {
+        if (!isset($post['page'])) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($post['msg'])) {
+            throw new FW\Exception('修改说明不能为空');
+        }
+        $path = strval($post['page']);
+        $matches = [];
+        if (!preg_match('/^([^\/]+)(\/(.+))?$/', $path, $matches)) {
+            throw new FW\Exception('非法操作');
+        }
+        $book = strval($matches[1]);
+        if (!isset($matches[3])) {
+            throw new FW\Exception('非法操作');
+        }
+        $page = strval($matches[3]);
+        $system_obj = Site\Model\System::get();
+        $books = $system_obj->get_booklist();
+        if (!isset($books[$book])) {
+            throw new FW\Exception('笔记不存在');
+        }
+        try {
+            $book_obj = new self($books[$book]['path']);
+            $book_obj->step_into($page);
+            return $book_obj->commit_change(strval($post['content']), strval($post['msg']));
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function push($path) {
+        $matches = [];
+        if (!preg_match('/^([^\/]+)?$/', $path, $matches)) {
+            throw new FW\Exception('非法操作');
+        }
+        $book = strval($matches[1]);
+        $system_obj = Site\Model\System::get();
+        $books = $system_obj->get_booklist();
+        if (!isset($books[$book])) {
+            throw new FW\Exception('笔记不存在');
+        }
+        try {
+            $book_obj = new self($books[$book]['path']);
+            return $book_obj->run_cmd('push');
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function pull($path) {
+        $matches = [];
+        if (!preg_match('/^([^\/]+)?$/', $path, $matches)) {
+            throw new FW\Exception('非法操作');
+        }
+        $book = strval($matches[1]);
+        $system_obj = Site\Model\System::get();
+        $books = $system_obj->get_booklist();
+        if (!isset($books[$book])) {
+            throw new FW\Exception('笔记不存在');
+        }
+        try {
+            $book_obj = new self($books[$book]['path']);
+            return $book_obj->run_cmd('pull');
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
     public static function parse_codebock($class, $code) {
         $cfg = FW\Config::get('code', $class, []);
         $ret = '';
@@ -434,9 +582,12 @@ class Book {
         $dir = $this->path;
         $dir = FW\File::conv_to($dir, $this->fsencoding);
         $client = new \Gitter\Client();
+        $system_obj = System::get();
         try {
             $repository = $client->getRepository($dir);
             $repository->setConfig('core.quotepath', 'false');
+            $repository->setConfig('user.name', $system_obj->git_name);
+            $repository->setConfig('user.email', $system_obj->git_email);
             return $repository;
         } catch (\RuntimeException $ex) {
             return null;
