@@ -7,9 +7,9 @@
             </div>
             <div class="modal-body">
                 <ul class="list-group">
-                    <{if $args->get_cur_path() != $args->get_book_name()}>
-                    <li class="list-group-item list-group-item-text"><a href="/book/edit/<{=$args->get_cur_path()}>">修改页面</a></li>
-                    <li class="list-group-item list-group-item-text"><a href="/book/history/1/<{=$args->get_cur_path()}>">页面历史记录</a></li>
+                    <{if !$args->is_root()}>
+                    <li class="list-group-item list-group-item-text"><a href="/book/edit/<{=$args->get_url()}>">修改页面</a></li>
+                    <li class="list-group-item list-group-item-text"><a href="/book/history/1/<{=$args->get_url()}>">页面历史记录</a></li>
                     <{/if}>
                     <li class="list-group-item list-group-item-text"><a href="/book/history/1/<{=$args->get_book_name()}>">笔记历史记录</a></li>
                     <li class="list-group-item list-group-item-text"><a class="ajax" href="/book/push/<{=$args->get_book_name()}>">推送更改</a></li>

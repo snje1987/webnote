@@ -40,27 +40,24 @@ class Book extends BaseRoute {
      * @route(prev=true)
      */
     private function c_view($args) {
-        $info = $this->path_info($args);
-        $system_obj = Site\Model\System::get();
-        $books = $system_obj->get_booklist();
+        $book_url = Site\Model\BookUrl::create($args);
+        if ($book_url == null) {
+            FW\Server::redirect('/');
+        }
+        $book_obj = Site\Model\Book::create($book_url);
+        if ($book_obj == null) {
+            FW\Server::redirect('/');
+        }
         try {
-            if (!isset($books[$info[0]])) {
+            $page_obj = $book_obj->get_page($book_url, true);
+            if ($page_obj == null) {
                 FW\Server::redirect('/');
             }
-            $book_obj = new Site\Model\Book($books[$info[0]]['path']);
-            $book_obj->step_into($info[1]);
-            FW\Tpl::prepend('title', $info[0] . '/' . $info[1] . '-');
-            FW\Tpl::assign('breadcrumb', $book_obj->get_breadcrumb());
-            $system_obj->enable_book($info[0]);
-            FW\Tpl::display('/book/view', $book_obj);
+            FW\Tpl::prepend('title', $page_obj->get_url() . '-');
+            FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
+            FW\Tpl::display('/book/view', $page_obj);
         } catch (FW\Exception $ex) {
-            $code = $ex->getCode();
-            if ($code == Site\Model\Book::BOOK_E_REDIRECT) {
-                FW\Server::redirect($ex->getMessage());
-            } else {
-                $system_obj->disable_book($info[0]);
-                FW\Server::redirect('/');
-            }
+            FW\Server::redirect('/book/view/' . $book_obj->get_book_name() . '/' . $ex->getMessage());
         }
     }
 
@@ -70,7 +67,7 @@ class Book extends BaseRoute {
     private function c_edit($args) {
 
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\Book::edit_page');
+            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::edit_page');
         }
         $system_obj = Site\Model\System::get();
         $info = $this->path_info($args);
@@ -94,53 +91,53 @@ class Book extends BaseRoute {
      * @route(prev=true)
      */
     private function c_list($args) {
-        $info = $this->path_info($args);
-        $system_obj = Site\Model\System::get();
-        $book_list = $system_obj->get_booklist();
+        $book_url = Site\Model\BookUrl::create($args);
+        if ($book_url == null) {
+            FW\Server::redirect('/');
+        }
+        $book_obj = Site\Model\Book::create($book_url);
+        if ($book_obj == null) {
+            FW\Server::redirect('/');
+        }
+
+        $page_obj = $book_obj->get_page($book_url);
+        if ($page_obj == null) {
+            FW\Server::redirect('/');
+        }
+        if ($page_obj->is_null()) {
+            FW\Server::redirect('/');
+        }
         $books = [];
         $dirs = [];
         $pages = [];
-        $book_obj = null;
-        try {
-            if (!isset($book_list[$info[0]])) {
-                throw new FW\Exception();
-            }
-            $book_obj = new Site\Model\Book($book_list[$info[0]]['path']);
-            if ($info[1] == '') {
-                $books = $book_list;
-            } else {
-                $siblings = $book_obj->get_siblings($info[1]);
-                $dirs = $siblings['dirs'];
-                $pages = $siblings['pages'];
-            }
-        } catch (FW\Exception $ex) {
-            $books = [];
-            $dirs = [];
-            $pages = [];
+
+        if ($page_obj->is_root()) {
+            $system_obj = Site\Model\System::get();
+            $books = $system_obj->get_booklist();
+        } else {
+            $siblings = $page_obj->get_siblings();
+            $dirs = $siblings['dirs'];
+            $pages = $siblings['pages'];
         }
-        $cur_path = $info[0];
-        if ($info[1] != '') {
-            $cur_path .= '/' . $info[1];
-        }
-        FW\Tpl::assign('cur_path', $cur_path);
+
         FW\Tpl::assign('books', $books);
         FW\Tpl::assign('dirs', $dirs);
         FW\Tpl::assign('pages', $pages);
-        FW\Tpl::display('/book/list', []);
+        FW\Tpl::display('/book/list', $page_obj);
     }
 
     /**
      * @route(prev=true)
      */
     private function c_push($args) {
-        FW\Common::json_call($args, 'Org\Snje\Webnote\Model\Book::push');
+        FW\Common::json_call($args, 'Org\Snje\Webnote\Model\BookUtils::push');
     }
 
     /**
      * @route(prev=true)
      */
     private function c_pull($args) {
-        FW\Common::json_call($args, 'Org\Snje\Webnote\Model\Book::pull');
+        FW\Common::json_call($args, 'Org\Snje\Webnote\Model\BookUtils::pull');
     }
 
     /**
