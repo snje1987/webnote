@@ -7,7 +7,7 @@
     <ol class="breadcrumb breadcrumb">
         <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
         &nbsp;&nbsp;
-        <li><a href="<{=FW\Server::referer()}>">返回</a></li>
+        <li><a href="/book/history/<{=$from_page}>/<{=$args->get_cur_path()}>">返回</a></li>
     </ol>
 </div>
 <{inc system_menu $args}>

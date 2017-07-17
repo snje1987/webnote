@@ -22,7 +22,7 @@
         <br />
         <button type="submit" class="btn btn-success btn-block">提交修改</button>
         <input type="hidden" name="page" value="<{=$args->get_cur_path()}>" />
-        <input type="hidden" name="returl" value="<{=FW\Server::referer()}>" />
+        <input type="hidden" name="returl" value="/book/view/<{=$args->get_cur_path()}>" />
     </div>
 </div>
  </form>

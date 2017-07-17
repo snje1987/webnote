@@ -206,6 +206,8 @@ class Book extends BaseRoute {
             $book_obj->get_diff($commit_hash, $page_path);
             FW\Tpl::assign('book_name', $book_name);
             FW\Tpl::assign('page_path', $page_path);
+            $from = isset($_GET['from']) ? intval($_GET['from']) : 1;
+            FW\Tpl::assign('from_page', $from);
             FW\Tpl::prepend('title', '[查询修改]' . $book_name . '/' . $page_path . '-');
             $system_obj->enable_book($book_name);
             FW\Tpl::display('/book/diff', $book_obj);
