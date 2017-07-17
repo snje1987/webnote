@@ -18,19 +18,6 @@ class Book extends BaseRoute {
     /**
      * @route(prev=true)
      */
-    private function c_ajax($args) {
-        $pinfo = FW\System::path_info('/' . $args);
-
-        $func = 'ajax_' . strval($pinfo[1]);
-        $args = strval($pinfo[3]);
-        if (method_exists(Site\Model\Book::class, $func)) {
-            Site\Model\Book::$func($args);
-        }
-    }
-
-    /**
-     * @route(prev=true)
-     */
     protected function c_file($args) {
         $info = $this->path_info($args);
         $system_obj = Site\Model\System::get();
@@ -61,14 +48,20 @@ class Book extends BaseRoute {
                 FW\Server::redirect('/');
             }
             $book_obj = new Site\Model\Book($books[$info[0]]['path']);
-            $book_obj->set_path($info[1]);
+            $book_obj->step_into($info[1]);
             FW\Tpl::prepend('title', $info[0] . '/' . $info[1] . '-');
             FW\Tpl::assign('breadcrumb', $book_obj->get_breadcrumb());
             $system_obj->enable_book($info[0]);
             FW\Tpl::display('/book/view', $book_obj);
-        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
-            $system_obj->disable_book($info[0]);
-            FW\Server::redirect('/');
+        } catch (FW\Exception $ex) {
+            $code = $ex->getCode();
+            if ($code == Site\Model\Book::BOOK_E_REDIRECT) {
+                FW\Server::redirect($ex->getMessage());
+            }
+            else {
+                $system_obj->disable_book($info[0]);
+                FW\Server::redirect('/');
+            }
         }
     }
 
@@ -85,7 +78,7 @@ class Book extends BaseRoute {
         $book_obj = null;
         try {
             if (!isset($book_list[$info[0]])) {
-                throw new fw\Exception();
+                throw new FW\Exception();
             }
             $book_obj = new Site\Model\Book($book_list[$info[0]]['path']);
             if ($info[1] == '') {
@@ -132,7 +125,10 @@ class Book extends BaseRoute {
                 FW\Server::redirect('/');
             }
             $book_obj = new Site\Model\Book($books[$book_name]['path']);
-            $data = $book_obj->get_history(intval($hist_page), $page_path);
+            if ($page_path != '') {
+                $book_obj->step_into($page_path);
+            }
+            $book_obj->get_history(intval($hist_page), $page_path);
             FW\Tpl::assign('book_name', $book_name);
             FW\Tpl::assign('page_path', $page_path);
             FW\Tpl::prepend('title', '[历史记录]' . $book_name . '/' . $page_path . '-');
@@ -165,7 +161,10 @@ class Book extends BaseRoute {
                 FW\Server::redirect('/');
             }
             $book_obj = new Site\Model\Book($books[$book_name]['path']);
-            $data = $book_obj->get_diff($commit_hash, $page_path);
+            if ($page_path != '') {
+                $book_obj->step_into($page_path);
+            }
+            $book_obj->get_diff($commit_hash, $page_path);
             FW\Tpl::assign('book_name', $book_name);
             FW\Tpl::assign('page_path', $page_path);
             FW\Tpl::prepend('title', '[查询修改]' . $book_name . '/' . $page_path . '-');

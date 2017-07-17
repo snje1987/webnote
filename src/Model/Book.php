@@ -30,6 +30,8 @@ class Book {
     const Type_All = 0;
     const Type_Enable = 1;
     const COUNT_PER_PAGE = 20;
+    const BOOK_E_ERROR = 0;
+    const BOOK_E_REDIRECT = 1;
 
     public function __construct($path) {
         $path = str_replace('\\', '/', $path);
@@ -54,7 +56,7 @@ class Book {
         return FW\File::put_content($info_file, $str, $this->fsencoding);
     }
 
-    public function set_path($path) {
+    public function step_into($path) {
         if ($path != '') {
             if (FW\File::call('is_file', $this->path . 'data/' . $path . '.md', $this->fsencoding)) {//存在相应的文件
                 $this->cur_page = self::basename($path);
@@ -62,18 +64,18 @@ class Book {
             } else if (FW\File::call('is_dir', $this->path . 'data/' . $path, $this->fsencoding)) {//存在相应目录
                 $page = $this->get_first_page('data/' . $path);
                 if ($page != '') {//目录中存在页面就显示
-                    FW\Server::redirect('/book/view/' . $this->data['name'] . '/' . $path . '/' . $page);
+                    throw new FW\Exception('/book/view/' . $this->data['name'] . '/' . $path . '/' . $page, self::BOOK_E_REDIRECT);
                 }
                 //不存在则显示空模板
                 $this->cur_dir = $path;
                 $this->cur_page = '';
             } else {//文件不存在
-                FW\Server::redirect('/book/view/' . $this->data['name'] . '/' . self::dirname($path));
+                throw new FW\Exception('/book/view/' . $this->data['name'] . '/' . self::dirname($path), self::BOOK_E_REDIRECT);
             }
         } else {
             $path = $this->get_first_page();
             if ($path != '') {
-                FW\Server::redirect('/book/view/' . $this->data['name'] . '/' . $path);
+                throw new FW\Exception('/book/view/' . $this->data['name'] . '/' . $path, self::BOOK_E_REDIRECT);
             } else {
                 $this->cur_dir = '';
                 $this->cur_page = '';
@@ -305,12 +307,12 @@ class Book {
         return 'data/' . $path . '.md';
     }
 
-    public function get_page_path($file, $unescape = false) {
-        if ($unescape) {
-            $file = preg_replace_callback('/\\\\([0-8]{3})/', function($matches) {
-                return chr(octdec($matches[1]));
-            }, $file);
-        }
+    public function get_page_path($file) {
+//        if ($unescape) {
+//            $file = preg_replace_callback('/\\\\([0-8]{3})/', function($matches) {
+//                return chr(octdec($matches[1]));
+//            }, $file);
+//        }
         if (strncmp($file, 'data', 4) === 0) {
             return htmlspecialchars(substr(trim($file), 5, -3));
         }
@@ -433,7 +435,9 @@ class Book {
         $dir = FW\File::conv_to($dir, $this->fsencoding);
         $client = new \Gitter\Client();
         try {
-            return $client->getRepository($dir);
+            $repository = $client->getRepository($dir);
+            $repository->setConfig('core.quotepath', 'false');
+            return $repository;
         } catch (\RuntimeException $ex) {
             return null;
         }

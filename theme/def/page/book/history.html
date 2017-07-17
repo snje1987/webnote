@@ -10,26 +10,7 @@
         <li><a href="/">返回</a></li>
     </ol>
 </div>
-<div class="modal fade bs-example-modal-lg" id="systemMenu" tabindex="-1" role="dialog" aria-labelledby="systemMenuLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="systemMenuLabel">选择您要进行的操作</h4>
-            </div>
-            <div class="modal-body">
-                <ul class="list-group">
-                    <li class="list-group-item list-group-item-text"><a class="ajax" href="/system/clearcache">清空缓存</a></li>
-                    <li class="list-group-item list-group-item-text"><a href="/system/chpwd">修改访问密码</a></li>
-                    <li class="list-group-item list-group-item-text"><a class="ajax" href="/system/logout">退出登陆</a></li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<{inc system_menu $args}>
 <div class="container-fluid">
     <table class="table table-bordered table-hover table-condensed table-striped">
         <tr>
