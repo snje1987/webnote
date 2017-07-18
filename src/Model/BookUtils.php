@@ -130,6 +130,16 @@ class BookUtils {
         }
     }
 
+    public static function comp_dirfirst($a, $b) {
+        if ($a['dir'] == $b['dir']) {
+            return strcmp($a['name'], $b['name']);
+        } elseif ($a['dir'] === true) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
     public static function parse_codebock($class, $code) {
         $cfg = FW\Config::get('code', $class, []);
         $ret = '';

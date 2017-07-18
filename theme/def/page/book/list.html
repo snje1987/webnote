@@ -1,24 +1,28 @@
 <{use Org\Snje\Minifw as FW}>
 <{use Org\Snje\Webnote as WN}>
 <{$cur_path=$args->get_url()}>
-<{foreach $books $k $v}>
-    <{if $k == $cur_path}>
-    <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k}>"><{=$k}></a></li>
+<{if $is_book}>
+    <{foreach $books $k $v}>
+        <{if $k == $cur_path}>
+        <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k}>"><{=$k}></a></li>
+        <{else}>
+        <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k}>"><{=$k}></a></li>
+        <{/if}>
+    <{/foreach}>
+<{else}>
+    <{foreach $list $v}>
+    <{if $v->is_dir()}>
+        <{if $v->get_url() == $cur_path}>
+        <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <{else}>
+        <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <{/if}>
     <{else}>
-    <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k}>"><{=$k}></a></li>
+        <{if $v->get_url() == $cur_path}>
+        <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <{else}>
+        <li class="list-group-item list-group-item-text"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <{/if}>
     <{/if}>
-<{/foreach}>
-<{foreach $dirs $k $v}>
-    <{if $v['path'] == $cur_path}>
-    <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v['path']}>"><{=$v['name']}></a></li>
-    <{else}>
-    <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v['path']}>"><{=$v['name']}></a></li>
-    <{/if}>
-<{/foreach}>
-<{foreach $pages $k $v}>
-    <{if $v['path'] == $cur_path}>
-    <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v['path']}>"><{=$v['name']}></a></li>
-    <{else}>
-    <li class="list-group-item list-group-item-text"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v['path']}>"><{=$v['name']}></a></li>
-    <{/if}>
-<{/foreach}>
+    <{/foreach}>
+<{/if}>

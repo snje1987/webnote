@@ -66,18 +66,18 @@ class BookPage {
                         'is_file'
                         , $this->root . 'data/' . $page . '.md'
                         , $this->fsencoding)) {
-            $this->page = rtrim(BookUtils::basename($page), '/');
+            $this->page = trim(BookUtils::basename($page), '/');
             $this->dir = trim(BookUtils::dirname($page), '/');
             $this->type = self::TYPE_PAGE;
         } else if (FW\File::call(
                         'is_dir'
                         , $this->root . 'data/' . $page
                         , $this->fsencoding)) {
-            $this->dir = rtrim($page, '/');
+            $this->dir = trim($page, '/');
             $this->page = '';
             $this->type = self::TYPE_DIR;
         } else {
-            $this->page = rtrim(BookUtils::basename($page), '/');
+            $this->page = trim(BookUtils::basename($page), '/');
             $this->dir = trim(BookUtils::dirname($page), '/');
             $this->type = self::TYPE_NULL;
         }
@@ -108,6 +108,15 @@ class BookPage {
         return $this->book_obj->get_book_name();
     }
 
+    public function get_node_name() {
+        if ($this->type == self::TYPE_PAGE || $this->type == self::TYPE_NULL) {
+            return $this->get_page();
+        } elseif ($this->dir != '') {
+            return BookUtils::basename($this->dir);
+        }
+        return $this->get_book_name();
+    }
+
     public function get_book_name() {
         return $this->book_obj->get_book_name();
     }
@@ -135,6 +144,9 @@ class BookPage {
         return $this->dir == '' && $this->page == '';
     }
 
+    /**
+     * @return \Org\Snje\Webnote\Model\BookPage
+     */
     public function get_first_page() {
         if ($this->type !== self::TYPE_DIR) {
             return null;
@@ -250,53 +262,41 @@ class BookPage {
         return $str;
     }
 
+    /**
+     * @return array
+     */
     public function get_file_list() {
         if (!$this->is_dir()) {
-            return [
-                'pages' => [],
-                'dirs' => [],
-            ];
+            return [];
         }
-
-        $ret = [
-            'pages' => [],
-            'dirs' => [],
-        ];
-
         $path = $this->root . 'data/' . $this->get_path();
         $list = FW\File::ls($path, '.md', false, $this->fsencoding);
-        $base = $this->get_url();
+        $base = $this->get_path();
 
-        usort($list, __NAMESPACE__ . '\BookUtils::comp_pagefirst');
-
+        usort($list, __NAMESPACE__ . '\BookUtils::comp_dirfirst');
+        $ret = [];
         foreach ($list as $v) {
             if ($v['dir'] === true) {
-                $ret['dirs'][] = [
-                    'name' => $v['name'],
-                    'path' => $base . '/' . $v['name'],
-                ];
+                $ret[] = new BookPage($this->book_obj, $base . '/' . $v['name']);
             } else {
                 if (strlen($v['name']) > 3 && substr($v['name'], -3) === '.md') {
                     $page = substr($v['name'], 0, strlen($v['name']) - 3);
-                    $ret['pages'][] = [
-                        'name' => $page,
-                        'path' => $base . '/' . $page,
-                    ];
+                    $ret[] = new BookPage($this->book_obj, $base . '/' . $page);
                 }
             }
         }
         return $ret;
     }
 
+    /**
+     * @return array
+     */
     public function get_siblings() {
         $parent = $this->get_parent();
         if ($parent != null && $parent->is_dir()) {
             return $parent->get_file_list();
         }
-        return [
-            'pages' => [],
-            'dirs' => [],
-        ];
+        return [];
     }
 
 }

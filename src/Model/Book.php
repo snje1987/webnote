@@ -17,8 +17,6 @@ class Book {
 
     protected $root = '';
     protected $data = [];
-    protected $cur_page = '';
-    protected $cur_dir = '';
     protected $encoding = '';
     protected $fsencoding = '';
 
@@ -232,25 +230,6 @@ class Book {
 
     public function get_book_name() {
         return $this->data['name'];
-    }
-
-    public function get_cur_dir() {
-        return $this->cur_dir;
-    }
-
-    public function get_cur_page() {
-        return $this->cur_page;
-    }
-
-    public function get_cur_path() {
-        $path = $this->data['name'];
-        if ($this->cur_dir != '') {
-            $path .= '/' . $this->cur_dir;
-        }
-        if ($this->cur_page != '') {
-            $path .= '/' . $this->cur_page;
-        }
-        return $path;
     }
 
     public function get_list() {

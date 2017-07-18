@@ -107,22 +107,17 @@ class Book extends BaseRoute {
         if ($page_obj->is_null()) {
             FW\Server::redirect('/');
         }
-        $books = [];
-        $dirs = [];
-        $pages = [];
 
         if ($page_obj->is_root()) {
             $system_obj = Site\Model\System::get();
             $books = $system_obj->get_booklist();
+            FW\Tpl::assign('is_book', true);
+            FW\Tpl::assign('books', $books);
         } else {
+            FW\Tpl::assign('is_book', false);
             $siblings = $page_obj->get_siblings();
-            $dirs = $siblings['dirs'];
-            $pages = $siblings['pages'];
+            FW\Tpl::assign('list', $siblings);
         }
-
-        FW\Tpl::assign('books', $books);
-        FW\Tpl::assign('dirs', $dirs);
-        FW\Tpl::assign('pages', $pages);
         FW\Tpl::display('/book/list', $page_obj);
     }
 
