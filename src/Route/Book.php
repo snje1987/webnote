@@ -42,16 +42,16 @@ class Book extends BaseRoute {
     private function c_view($args) {
         $book_url = Site\Model\BookUrl::create($args);
         if ($book_url == null) {
-            FW\Server::redirect('/');
+            $this->show_last_page();
         }
         $book_obj = Site\Model\Book::create($book_url);
         if ($book_obj == null) {
-            FW\Server::redirect('/');
+            $this->show_last_page();
         }
         try {
             $page_obj = $book_obj->get_page($book_url, true);
             if ($page_obj == null) {
-                FW\Server::redirect('/');
+                $this->show_last_page();
             }
             FW\Tpl::prepend('title', $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
