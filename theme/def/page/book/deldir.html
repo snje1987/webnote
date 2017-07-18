@@ -2,7 +2,6 @@
 <{use Org\Snje\Webnote as WN}>
 <{inc header}>
 <div class="container-fluid">
-    <{$bookname=$args->get_book_name()}>
     <ol class="breadcrumb breadcrumb">
         <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
         &nbsp;&nbsp;
@@ -12,15 +11,20 @@
     </ol>
 </div>
 <{inc system_menu $args}>
+<form class="fsubmit" action="/book/deldir/" method="post" enctype="multipart/form-data" role="form">
 <div class="container-fluid">
-    <{if $args->is_dir()}>
-    <div class="alert alert-warning">目录内容为空</div>
-    <div class="btn-toolbar">
-        <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>/new">新页面</a>
-        <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>/new">新目录</a>
+    <div id="editor">
+        <button type="submit" class="btn btn-success btn-block">确认删除</button>
+        <input type="hidden" name="dir" value="<{=$args->get_url()}>" />
+        <input type="hidden" name="returl" value="/book/view/<{=$args->get_url()}>" />
     </div>
-    <{else}>
-    <div id="page"><{=$args->get_content()}></div>
-    <{/if}>
 </div>
+ </form>
+<script type="text/javascript">
+(function($){
+    $(document).ready(function(){
+        $('.fsubmit').fsubmit();
+    });
+})(jQuery);
+</script>
 <{inc footer}>

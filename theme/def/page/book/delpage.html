@@ -11,14 +11,12 @@
     </ol>
 </div>
 <{inc system_menu $args}>
-<form class="fsubmit" action="/book/edit/" method="post" enctype="multipart/form-data" role="form">
+<form class="fsubmit" action="/book/delpage/" method="post" enctype="multipart/form-data" role="form">
 <div class="container-fluid">
     <div id="editor">
-        <textarea name="content" class="form-control" rows="20"><{=htmlspecialchars($args->get_raw())}></textarea>
+        <input type="text" class="form-control" name="msg" placeholder="请输入删除说明"/>
         <br />
-        <input type="text" class="form-control" name="msg" placeholder="请输入修改说明"/>
-        <br />
-        <button type="submit" class="btn btn-success btn-block">提交修改</button>
+        <button type="submit" class="btn btn-success btn-block">确认删除</button>
         <input type="hidden" name="page" value="<{=$args->get_url()}>" />
         <input type="hidden" name="returl" value="/book/view/<{=$args->get_url()}>" />
     </div>

@@ -14,7 +14,6 @@
 <form class="fsubmit" action="/book/edit/" method="post" enctype="multipart/form-data" role="form">
 <div class="container-fluid">
     <div id="editor">
-        <textarea name="content" class="form-control" rows="20"><{=htmlspecialchars($args->get_raw())}></textarea>
         <br />
         <input type="text" class="form-control" name="msg" placeholder="请输入修改说明"/>
         <br />
@@ -27,7 +26,15 @@
 <script type="text/javascript">
 (function($){
     $(document).ready(function(){
-        $('.fsubmit').fsubmit();
+        $('.fsubmit').fsubmit({
+            'check':function(){
+                if($('input[name="msg"]').val() === ''){
+                    alert('修改说明不能为空');
+                    return false;
+                }
+                return true;
+            }
+        });
     });
 })(jQuery);
 </script>

@@ -29,11 +29,62 @@ use Org\Snje\Webnote as Site;
  */
 class BookUtils {
 
-    public static function edit_page($post) {
+    public static function addpage($post) {
+        if (!isset($post['dir'])) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($post['msg']) || $post['msg'] == '') {
+            throw new FW\Exception('修改说明不能为空');
+        }
+        if (!isset($post['name']) || $post['name'] == '') {
+            throw new FW\Exception('页面名称不能为空');
+        }
+        $page_obj = self::get_page_from_url($post['dir']);
+        if ($page_obj == null || !$page_obj->is_dir()) {
+            throw new FW\Exception('非法操作');
+        }
+
+        try {
+            $new_page = new BookPage(
+                    $page_obj->get_book()
+                    , $page_obj->get_path() . '/' . strval($post['name']));
+            return $new_page->addpage($post['content'], $post['msg']);
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function adddir($post) {
+        if (!isset($post['dir'])) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($post['name']) || $post['name'] == '') {
+            throw new FW\Exception('目录名称不能为空');
+        }
+        $page_obj = self::get_page_from_url($post['dir']);
+        if ($page_obj == null || !$page_obj->is_dir()) {
+            throw new FW\Exception('非法操作');
+        }
+
+        try {
+            $new_page = new BookPage(
+                    $page_obj->get_book()
+                    , $page_obj->get_path() . '/' . strval($post['name']));
+            return $new_page->adddir();
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function editpage($post) {
         if (!isset($post['page'])) {
             throw new FW\Exception('非法操作');
         }
-        if (!isset($post['msg'])) {
+        if (!isset($post['msg']) || $post['msg'] == '') {
             throw new FW\Exception('修改说明不能为空');
         }
         $page_obj = self::get_page_from_url($post['page']);
@@ -43,6 +94,43 @@ class BookUtils {
 
         try {
             return $page_obj->edit(strval($post['content']), strval($post['msg']));
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function delpage($post) {
+        if (!isset($post['page'])) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($post['msg']) || $post['msg'] == '') {
+            throw new FW\Exception('修改说明不能为空');
+        }
+        $page_obj = self::get_page_from_url($post['page']);
+        if ($page_obj == null || !$page_obj->is_page()) {
+            throw new FW\Exception('非法操作');
+        }
+        try {
+            return $page_obj->delete($post['msg']);
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function deldir($post) {
+        if (!isset($post['dir'])) {
+            throw new FW\Exception('非法操作');
+        }
+        $page_obj = self::get_page_from_url($post['dir']);
+        if ($page_obj == null || !$page_obj->is_dir()) {
+            throw new FW\Exception('非法操作');
+        }
+        try {
+            return $page_obj->delete();
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -96,7 +184,7 @@ class BookUtils {
     /**
      * @return \Org\Snje\Webnote\Model\BookPage
      */
-    public static function get_page_from_url($url, $allow_suggest = false) {
+    public static function get_page_from_url($url, $allow_suggest = false, $allow_null = false) {
         $book_url = Site\Model\BookUrl::create(strval($url));
         if ($book_url == null) {
             return null;
@@ -105,11 +193,13 @@ class BookUtils {
         if ($book_obj == null) {
             return null;
         }
-        $page_obj = $book_obj->get_page($book_url, $allow_suggest);
-        if ($page_obj == null) {
-            return null;
+        if ($allow_suggest) {
+            return $book_obj->get_page($book_url, $allow_suggest);
         }
-        return $page_obj;
+        elseif ($allow_null) {
+            return new BookPage($book_obj, $book_url->get_page());
+        }
+        return $book_obj->get_page($book_url);
     }
 
     public static function dirname($page) {

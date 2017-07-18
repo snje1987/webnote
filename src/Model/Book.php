@@ -83,6 +83,9 @@ class Book {
         }
         if ($page->is_dir()) {
             $subpage = $page->get_first_page();
+            if ($subpage == null) {
+                return $page;
+            }
             if (!$subpage->is_null()) {
                 throw new FW\Exception($subpage->get_path());
             }

@@ -62,7 +62,7 @@ class Book extends BaseRoute {
      */
     private function c_edit($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::edit_page');
+            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::editpage');
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
@@ -162,6 +162,124 @@ class Book extends BaseRoute {
             FW\Tpl::assign('from_page', $from);
             FW\Tpl::prepend('title', '[查询修改]' . $page_obj->get_url() . '-');
             FW\Tpl::display('/book/diff', $page_obj);
+        } catch (FW\Exception $ex) {
+            $this->show_last_page();
+        }
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_movepage($args) {
+        $this->show_last_page();
+        if ($_POST) {
+            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::movepage');
+        }
+        try {
+            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            if ($page_obj == null || !$page_obj->is_page()) {
+                $this->show_last_page();
+            }
+            FW\Tpl::prepend('title', '[移动页面]-' . $page_obj->get_url() . '-');
+            FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
+            FW\Tpl::display('/book/movepage', $page_obj);
+        } catch (FW\Exception $ex) {
+            $this->show_last_page();
+        }
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_movedir($args) {
+        $this->show_last_page();
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_addpage($args) {
+        if ($_POST) {
+            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addpage');
+        }
+        try {
+            $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
+            if ($page_obj == null) {
+                $this->show_last_page();
+            }
+            $parent = $page_obj->get_parent();
+            if ($parent == null) {
+                $this->show_last_page();
+            }
+            FW\Tpl::prepend('title', '[新增页面]-' . $parent->get_url() . '-');
+            FW\Tpl::assign('breadcrumb', $parent->get_breadcrumb());
+            FW\Tpl::assign('parent', $parent);
+            FW\Tpl::display('/book/addpage', $page_obj);
+        } catch (FW\Exception $ex) {
+            $this->show_last_page();
+        }
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_adddir($args) {
+        if ($_POST) {
+            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::adddir');
+        }
+        try {
+            $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
+            if ($page_obj == null) {
+                $this->show_last_page();
+            }
+            $parent = $page_obj->get_parent();
+            if ($parent == null) {
+                $this->show_last_page();
+            }
+            FW\Tpl::prepend('title', '[新增目录]-' . $parent->get_url() . '-');
+            FW\Tpl::assign('breadcrumb', $parent->get_breadcrumb());
+            FW\Tpl::assign('parent', $parent);
+            FW\Tpl::display('/book/adddir', $page_obj);
+        } catch (FW\Exception $ex) {
+            $this->show_last_page();
+        }
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_delpage($args) {
+        if ($_POST) {
+            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delpage');
+        }
+        try {
+            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            if ($page_obj == null || !$page_obj->is_page()) {
+                $this->show_last_page();
+            }
+            FW\Tpl::prepend('title', '[删除页面]-' . $page_obj->get_url() . '-');
+            FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
+            FW\Tpl::display('/book/delpage', $page_obj);
+        } catch (FW\Exception $ex) {
+            $this->show_last_page();
+        }
+    }
+
+    /**
+     * @route(prev=true)
+     */
+    private function c_deldir($args) {
+        if ($_POST) {
+            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::deldir');
+        }
+        try {
+            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            if ($page_obj == null || !$page_obj->is_dir()) {
+                $this->show_last_page();
+            }
+            FW\Tpl::prepend('title', '[删除目录]-' . $page_obj->get_url() . '-');
+            FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
+            FW\Tpl::display('/book/deldir', $page_obj);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }

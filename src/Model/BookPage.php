@@ -56,6 +56,7 @@ class BookPage {
      * @return \Org\Snje\Webnote\Model\BookPage
      */
     public function __construct($book, $page) {
+        $page = str_replace('..', '', $page);
         $this->book_obj = $book;
         $this->root = $this->book_obj->get_book_root();
         $this->fsencoding = $this->book_obj->get_fsencoding();
@@ -111,7 +112,12 @@ class BookPage {
 
     public function get_file_path() {
         $path = $this->get_path();
-        return $this->root . 'data/' . $path . '.md';
+        if ($this->is_page()) {
+            return $this->root . 'data/' . $path . '.md';
+        }
+        else {
+            return $this->root . 'data/' . $path;
+        }
     }
 
     public function get_page_path($file) {
@@ -173,6 +179,9 @@ class BookPage {
         $list = FW\File::ls($path, '.md', false, $this->fsencoding);
         usort($list, __NAMESPACE__ . '\BookUtils::comp_pagefirst');
         reset($list);
+        if (count($list) == 0) {
+            return null;
+        }
         $v = current($list);
         if ($v['dir']) {
             return new BookPage($this->book_obj, $this->get_path() . '/' . $v['name']);
@@ -400,6 +409,57 @@ class BookPage {
             return false;
         }
         return $this->book_obj->git_cmd('commit', $msg);
+    }
+
+    public function addpage($content, $msg) {
+        if (!$this->is_null()) {
+            return false;
+        }
+        $path = $this->get_file_path() . '.md';
+        if (FW\File::call('file_exists', $path, $this->fsencoding)) {
+            return false;
+        }
+
+        $content = str_replace("\r", '', $content);
+        if (substr($content, -1, 1) != "\n") {
+            $content .= "\n";
+        }
+
+        if (!FW\File::put_content($path, $content, $this->fsencoding)) {
+            return false;
+        }
+        return $this->book_obj->git_cmd('commit', $msg);
+    }
+
+    public function adddir() {
+        if (!$this->is_null()) {
+            return false;
+        }
+        $path = $this->get_file_path();
+        if (FW\File::call('file_exists', $path, $this->fsencoding)) {
+            return false;
+        }
+        FW\File::mkdir($path, $this->fsencoding);
+        return true;
+    }
+
+    public function delete($msg = '') {
+        if ($this->is_page()) {
+            $path = $this->get_file_path();
+            FW\File::delete($path, true);
+            return $this->book_obj->git_cmd('commit', $msg);
+        }
+        elseif ($this->is_dir()) {
+            $list = $this->get_file_list();
+            if (!empty($list)) {
+                throw new FW\Exception('目录不为空');
+            }
+            $path = $this->get_file_path();
+            FW\File::delete($path, true);
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
