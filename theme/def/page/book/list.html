@@ -3,23 +3,39 @@
 <{$cur_path=$args->get_url()}>
 <{if $args->is_root()}>
 <div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
-    <a class="btn btn-success" href="/book/history/1/<{=$args->get_book_name()}>">历史记录</a>
-    <a class="btn btn-success ajax" href="/book/push/<{=$args->get_book_name()}>">推送更改</a>
-    <a class="btn btn-success ajax" href="/book/pull/<{=$args->get_book_name()}>">获取更新</a>
+    <a class="btn btn-success" href="/book/history/1/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-list-alt"></span>
+    </a>
+    <a class="btn btn-success ajax" href="/book/push/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-upload"></span>
+    </a>
+    <a class="btn btn-success ajax" href="/book/pull/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-download"></span>
+    </a>
 </div>
 <{else}>
 <div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
     <{if $args->is_dir()}>
-    <a class="btn btn-success" href="/book/deldir/<{=$args->get_url()}>">删除</a>
-    <a class="btn btn-success" href="/book/movedir/<{=$args->get_url()}>">移动</a>
+    <a class="btn btn-success" href="/book/deldir/<{=$args->get_url()}>">
+        <span class="glyphicon glyphicon glyphicon-minus"></span>
+    </a>
     <{elseif $args->is_page()}>
-    <a class="btn btn-success" href="/book/history/1/<{=$args->get_url()}>">历史记录</a>
-    <a class="btn btn-success" href="/book/edit/<{=$args->get_url()}>">修改</a>
-    <a class="btn btn-success" href="/book/delpage/<{=$args->get_url()}>">删除</a>
-    <a class="btn btn-success" href="/book/movepage/<{=$args->get_url()}>">移动</a>
+    <a class="btn btn-success" href="/book/history/1/<{=$args->get_url()}>">
+        <span class="glyphicon glyphicon-list-alt"></span>
+    </a>
+    <a class="btn btn-success" href="/book/edit/<{=$args->get_url()}>">
+        <span class="glyphicon glyphicon glyphicon-edit"></span>
+    </a>
+    <a class="btn btn-success" href="/book/delpage/<{=$args->get_url()}>">
+        <span class="glyphicon glyphicon glyphicon-minus"></span>
+    </a>
     <{/if}>
-    <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>">新页面</a>
-    <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>">新目录</a>
+    <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>">
+        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-folder-open"></span><
+        /a>
+    <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>">
+        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-file"></span>
+    </a>
 </div>
 <{/if}>
 <div class="list-group">
