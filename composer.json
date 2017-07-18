@@ -6,7 +6,8 @@
         "twbs/bootstrap": "3.*",
         "components/jquery": "3.*",
         "jquery-form/form": "4.*",
-        "components/highlightjs": "9.*"
+        "components/highlightjs": "9.*",
+        "bootstrap-select/bootstrap-select": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "5.3.*"

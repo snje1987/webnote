@@ -36,6 +36,7 @@ class Resource {
     ];
     const COMPOSER_DIRS = [
         'twbs/bootstrap/dist/' => 'www/lib/bootstrap/',
+        'bootstrap-select/bootstrap-select/dist/' => 'www/lib/bootstrap-select/',
     ];
 
     public static function copy_composer_resource() {
