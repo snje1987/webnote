@@ -10,16 +10,16 @@
 <{else}>
 <div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
     <{if $args->is_dir()}>
-    <a class="btn btn-success ajax" href="/book/delpage/<{=$args->get_url()}>">删除目录</a>
-    <a class="btn btn-success ajax" href="/book/movedir/<{=$args->get_url()}>">移动目录</a>
+    <a class="btn btn-success ajax" href="/book/delpage/<{=$args->get_url()}>">删除</a>
+    <a class="btn btn-success ajax" href="/book/movedir/<{=$args->get_url()}>">移动</a>
     <{elseif $args->is_page()}>
     <a class="btn btn-success" href="/book/history/1/<{=$args->get_url()}>">历史记录</a>
-    <a class="btn btn-success" href="/book/edit/<{=$args->get_url()}>">修改页面</a>
-    <a class="btn btn-success ajax" href="/book/delpage/<{=$args->get_url()}>">删除页面</a>
-    <a class="btn btn-success ajax" href="/book/movepage/<{=$args->get_url()}>">移动页面</a>
+    <a class="btn btn-success" href="/book/edit/<{=$args->get_url()}>">修改</a>
+    <a class="btn btn-success ajax" href="/book/delpage/<{=$args->get_url()}>">删除</a>
+    <a class="btn btn-success ajax" href="/book/movepage/<{=$args->get_url()}>">移动</a>
     <{/if}>
-    <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>">新增页面</a>
-    <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>">新增目录</a>
+    <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>">新页面</a>
+    <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>">新目录</a>
 </div>
 <{/if}>
 <div class="list-group">
