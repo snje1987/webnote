@@ -1,13 +1,12 @@
 <{use Org\Snje\Minifw as FW}>
 <{use Org\Snje\Webnote as WN}>
 <{inc header}>
+<{$url=$args->get_url()}>
 <div class="container-fluid">
-    <{$bookname=$args->get_book_name()}>
-    <{$cur_page=$args->get_cur_page()}>
     <ol class="breadcrumb breadcrumb">
         <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
         &nbsp;&nbsp;
-        <li><a href="/book/history/<{=$from_page}>/<{=$args->get_cur_path()}>">返回</a></li>
+        <li><a href="/book/history/<{=$from_page}>/<{=$url}>">返回</a></li>
     </ol>
 </div>
 <{inc system_menu $args}>
@@ -28,134 +27,25 @@
         </tr>
     </table>
 </div>
-    <{if $file_obj != null}>
-    <{$diff = $file_obj[0]}>
+<{$diffs = $commit_obj->getDiffs()}>
+<{foreach $diffs $diff}>
     <{$lines = $diff->getLines()}>
     <div class="container-fluid">
         <div class="panel panel-default">
-            <{if strncmp($lines[0]->getLine(),'new file mode', 13) === 0}>
+            <{if strncmp($lines[0]->getLine(),'similarity index', 16) === 0}>
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    <span class="label label-success">新建</span>
-                    <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}></span>
+                    <span class="label label-primary">重命名</span>
+                    <span class="label label-default"><{=$args->get_page_path(trim(substr($lines[1]->getLine(),12),"\""))}></span>
+                    &nbsp;=>&nbsp;
+                    <span class="label label-default"><{=$args->get_page_path(trim(substr($lines[2]->getLine(),10),"\""))}></span>
                 </h3>
             </div>
-            <{elseif strncmp($lines[0]->getLine(),'deleted file mode', 17) === 0}>
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                    <span class="label label-danger">删除</span>
-                    <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getOld(),4),"\""),2))}></span>
-                </h3>
-            </div>
-            <{elseif $lines[0]->getType() == 'chunk'}>
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                    <{$name = $args->get_page_path(trim($diff->getFile()))}>
-                    <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}><{/if}>
-                    <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getOld,4),"\""),2))}><{/if}>
-                    <span class="label label-primary">修改</span>
-                    <span class="label label-default"><{=$name}></span>
-                </h3>
-            </div>
-            <{else}>
-            <pre>
-                <{=htmlspecialchars(print_r($diff))}>
-            </pre>
-            <{/if}>
-            <div class="panel-body">
-                <pre class="code">
-                <{foreach $lines $k $line}>
-                    <{$type = $line->getType()}>
-                    <{if $type == 'chunk'}>
-                    <p style="color:blue;"><{=htmlspecialchars($line->getLine())}></p>
-                    <{elseif $type == ''}>
-                    <p><{=$line->getLine()}></p>
-                    <{elseif $type == 'new'}>
-                    <p style="color:green;"><{=htmlspecialchars($line->getLine())}></p>
-                    <{elseif $type == 'old'}>
-                    <p style="color:red;"><{=htmlspecialchars($line->getLine())}></p>
-                    <{else}>
-                    <pre>
-                        <{=htmlspecialchars(print_r($line))}>
-                    </pre>
-                    <{/if}>
-                <{/foreach}>
-                </pre>
-            </div>
-        </div>
-    </div>
-    <{else}>
-    <{$diffs = $commit_obj->getDiffs()}>
-    <{foreach $diffs $diff}>
-        <{$lines = $diff->getLines()}>
-        <div class="container-fluid">
-            <div class="panel panel-default">
-                <{if strncmp($lines[0]->getLine(),'similarity index', 16) === 0}>
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <span class="label label-primary">重命名</span>
-                        <span class="label label-default"><{=$args->get_page_path(trim(substr($lines[1]->getLine(),12),"\""))}></span>
-                        &nbsp;=>&nbsp;
-                        <span class="label label-default"><{=$args->get_page_path(trim(substr($lines[2]->getLine(),10),"\""))}></span>
-                    </h3>
-                </div>
+            <{if count($lines) > 4}>
                 <div class="panel-body">
-                    <{if count($lines) > 4}>
-                        <pre class="code">
-                        <{foreach $lines $k $line}>
-                            <{if $k >= 3}>
-                                <{$type = $line->getType()}>
-                                <{if $type == 'chunk'}>
-                                <p style="color:blue;"><{=htmlspecialchars($line->getLine())}></p>
-                                <{elseif $type == ''}>
-                                <p><{=$line->getLine()}></p>
-                                <{elseif $type == 'new'}>
-                                <p style="color:green;"><{=htmlspecialchars($line->getLine())}></p>
-                                <{elseif $type == 'old'}>
-                                <p style="color:red;"><{=htmlspecialchars($line->getLine())}></p>
-                                <{else}>
-                                <pre>
-                                    <{=htmlspecialchars(print_r($line))}>
-                                </pre>
-                                <{/if}>
-                            <{/if}>
-                        <{/foreach}>
-                        </pre>
-                    <{/if}>
-                </div>
-                <{else}>
-                    <{if strncmp($lines[0]->getLine(),'new file mode', 13) === 0}>
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <span class="label label-success">新建</span>
-                            <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}></span>
-                        </h3>
-                    </div>
-                    <{elseif strncmp($lines[0]->getLine(),'deleted file mode', 17) === 0}>
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <span class="label label-danger">删除</span>
-                            <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getOld(),4),"\""),2))}></span>
-                        </h3>
-                    </div>
-                    <{elseif $lines[0]->getType() == 'chunk'}>
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <{$name = $args->get_page_path(trim($diff->getFile()))}>
-                            <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}><{/if}>
-                            <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getOld,4),"\""),2))}><{/if}>
-                            <span class="label label-primary">修改</span>
-                            <span class="label label-default"><{=$name}></span>
-                        </h3>
-                    </div>
-                    <{else}>
-                    <pre>
-                        <{=htmlspecialchars(print_r($diff))}>
-                    </pre>
-                    <{/if}>
-                    <div class="panel-body">
-                        <pre class="code">
-                        <{foreach $lines $k $line}>
+                    <pre class="code">
+                    <{foreach $lines $k $line}>
+                        <{if $k >= 3}>
                             <{$type = $line->getType()}>
                             <{if $type == 'chunk'}>
                             <p style="color:blue;"><{=htmlspecialchars($line->getLine())}></p>
@@ -170,13 +60,64 @@
                                 <{=htmlspecialchars(print_r($line))}>
                             </pre>
                             <{/if}>
-                        <{/foreach}>
-                        </pre>
-                    </div>
+                        <{/if}>
+                    <{/foreach}>
+                    </pre>
+                </div>
+            <{/if}>
+            <{else}>
+                <{if strncmp($lines[0]->getLine(),'new file mode', 13) === 0}>
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <span class="label label-success">新建</span>
+                        <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}></span>
+                    </h3>
+                </div>
+                <{elseif strncmp($lines[0]->getLine(),'deleted file mode', 17) === 0}>
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <span class="label label-danger">删除</span>
+                        <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getOld(),4),"\""),2))}></span>
+                    </h3>
+                </div>
+                <{elseif $lines[0]->getType() == 'chunk'}>
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <{$name = $args->get_page_path(trim($diff->getFile()))}>
+                        <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}><{/if}>
+                        <{if $name == ''}><{$name = $args->get_page_path(substr(trim(substr($diff->getOld,4),"\""),2))}><{/if}>
+                        <span class="label label-primary">修改</span>
+                        <span class="label label-default"><{=$name}></span>
+                    </h3>
+                </div>
+                <{else}>
+                <pre>
+                    <{=htmlspecialchars(print_r($diff))}>
+                </pre>
                 <{/if}>
-            </div>
+                <div class="panel-body">
+                    <pre class="code">
+                    <{foreach $lines $k $line}>
+                        <{$type = $line->getType()}>
+                        <{if $type == 'chunk'}>
+                        <p style="color:blue;"><{=htmlspecialchars($line->getLine())}></p>
+                        <{elseif $type == ''}>
+                        <p><{=$line->getLine()}></p>
+                        <{elseif $type == 'new'}>
+                        <p style="color:green;"><{=htmlspecialchars($line->getLine())}></p>
+                        <{elseif $type == 'old'}>
+                        <p style="color:red;"><{=htmlspecialchars($line->getLine())}></p>
+                        <{else}>
+                        <pre>
+                            <{=htmlspecialchars(print_r($line))}>
+                        </pre>
+                        <{/if}>
+                    <{/foreach}>
+                    </pre>
+                </div>
+            <{/if}>
         </div>
-    <{/foreach}>
-    <{/if}>
+    </div>
+<{/foreach}>
 <{/if}>
 <{inc footer}>

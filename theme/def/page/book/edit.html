@@ -2,8 +2,6 @@
 <{use Org\Snje\Webnote as WN}>
 <{inc header}>
 <div class="container-fluid">
-    <{$bookname=$args->get_book_name()}>
-    <{$cur_page=$args->get_cur_page()}>
     <ol class="breadcrumb breadcrumb">
         <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
         &nbsp;&nbsp;
@@ -21,8 +19,8 @@
         <input type="text" class="form-control" name="msg" placeholder="请输入修改说明"/>
         <br />
         <button type="submit" class="btn btn-success btn-block">提交修改</button>
-        <input type="hidden" name="page" value="<{=$args->get_cur_path()}>" />
-        <input type="hidden" name="returl" value="/book/view/<{=$args->get_cur_path()}>" />
+        <input type="hidden" name="page" value="<{=$args->get_url()}>" />
+        <input type="hidden" name="returl" value="/book/view/<{=$args->get_url()}>" />
     </div>
 </div>
  </form>

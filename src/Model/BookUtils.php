@@ -36,25 +36,13 @@ class BookUtils {
         if (!isset($post['msg'])) {
             throw new FW\Exception('修改说明不能为空');
         }
-        $path = strval($post['page']);
-        $matches = [];
-        if (!preg_match('/^([^\/]+)(\/(.+))?$/', $path, $matches)) {
+        $page_obj = self::get_page_from_url($post['page']);
+        if ($page_obj == null || !$page_obj->is_page()) {
             throw new FW\Exception('非法操作');
         }
-        $book = strval($matches[1]);
-        if (!isset($matches[3])) {
-            throw new FW\Exception('非法操作');
-        }
-        $page = strval($matches[3]);
-        $system_obj = Site\Model\System::get();
-        $books = $system_obj->get_booklist();
-        if (!isset($books[$book])) {
-            throw new FW\Exception('笔记不存在');
-        }
+
         try {
-            $book_obj = new Book($books[$book]['path']);
-            $book_obj->step_into($page);
-            return $book_obj->edit_page(strval($post['content']), strval($post['msg']));
+            return $page_obj->edit(strval($post['content']), strval($post['msg']));
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -63,18 +51,11 @@ class BookUtils {
     }
 
     public static function push($path) {
-        $matches = [];
-        if (!preg_match('/^([^\/]+)?$/', $path, $matches)) {
+        $book_obj = self::get_book_from_url($path);
+        if ($book_obj == null) {
             throw new FW\Exception('非法操作');
         }
-        $book = strval($matches[1]);
-        $system_obj = Site\Model\System::get();
-        $books = $system_obj->get_booklist();
-        if (!isset($books[$book])) {
-            throw new FW\Exception('笔记不存在');
-        }
         try {
-            $book_obj = new Book($books[$book]['path']);
             return $book_obj->git_cmd('push');
         } catch (FW\Exception $ex) {
             throw $ex;
@@ -84,24 +65,51 @@ class BookUtils {
     }
 
     public static function pull($path) {
-        $matches = [];
-        if (!preg_match('/^([^\/]+)?$/', $path, $matches)) {
+        $book_obj = self::get_book_from_url($path);
+        if ($book_obj == null) {
             throw new FW\Exception('非法操作');
         }
-        $book = strval($matches[1]);
-        $system_obj = Site\Model\System::get();
-        $books = $system_obj->get_booklist();
-        if (!isset($books[$book])) {
-            throw new FW\Exception('笔记不存在');
-        }
         try {
-            $book_obj = new Book($books[$book]['path']);
             return $book_obj->git_cmd('pull');
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
+    }
+
+    /**
+     * @return \Org\Snje\Webnote\Model\Book
+     */
+    public static function get_book_from_url($url) {
+        $book_url = Site\Model\BookUrl::create(strval($url));
+        if ($book_url == null) {
+            return null;
+        }
+        $book_obj = Site\Model\Book::create($book_url);
+        if ($book_obj == null) {
+            return null;
+        }
+        return $book_obj;
+    }
+
+    /**
+     * @return \Org\Snje\Webnote\Model\BookPage
+     */
+    public static function get_page_from_url($url, $allow_suggest = false) {
+        $book_url = Site\Model\BookUrl::create(strval($url));
+        if ($book_url == null) {
+            return null;
+        }
+        $book_obj = Site\Model\Book::create($book_url);
+        if ($book_obj == null) {
+            return null;
+        }
+        $page_obj = $book_obj->get_page($book_url, $allow_suggest);
+        if ($page_obj == null) {
+            return null;
+        }
+        return $page_obj;
     }
 
     public static function dirname($page) {

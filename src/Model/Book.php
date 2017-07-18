@@ -22,7 +22,6 @@ class Book {
 
     const Type_All = 0;
     const Type_Enable = 1;
-    const COUNT_PER_PAGE = 20;
     const BOOK_E_ERROR = 0;
     const BOOK_E_REDIRECT = 1;
 
@@ -111,48 +110,6 @@ class Book {
         return ['returl' => '/book/view/' . $this->data['name']];
     }
 
-    public function get_raw() {
-        if ($this->cur_page == '') {
-            return '';
-        }
-
-        if ($this->cur_dir != '') {
-            $this->cur_dir .= '/';
-        }
-
-        $src = $this->root . 'data/' . $this->cur_dir . $this->cur_page . '.md';
-        if (!FW\File::call('is_file', $src, $this->fsencoding)) {
-            return '';
-        }
-        $str = FW\File::get_content($src, $this->fsencoding);
-        return $str;
-    }
-
-    public function edit_page($content, $msg) {
-        if ($this->cur_page == '') {
-            return false;
-        }
-
-        if ($this->cur_dir != '') {
-            $this->cur_dir .= '/';
-        }
-
-        $path = $this->root . 'data/' . $this->cur_dir . $this->cur_page . '.md';
-        if (!FW\File::call('is_file', $path, $this->fsencoding)) {
-            return false;
-        }
-
-        $content = str_replace("\r", '', $content);
-        if (substr($content, -1, 1) != "\n") {
-            $content .= "\n";
-        }
-
-        if (!FW\File::put_content($path, $content, $this->fsencoding)) {
-            return false;
-        }
-        return $this->git_cmd('commit', $msg);
-    }
-
     public function git_cmd($cmd, $args = '') {
         $repository = $this->get_Repository();
         if ($repository == null) {
@@ -173,59 +130,6 @@ class Book {
             throw new FW\Exception($ex->getMessage());
         }
         return true;
-    }
-
-    public function get_history($page, $path) {
-        $repository = $this->get_Repository();
-        FW\Tpl::assign('data', []);
-        if ($repository === null) {
-            return;
-        }
-        $page = intval($page);
-        if ($page < 1) {
-            $page = 1;
-        }
-        $count = $repository->getTotalCommits();
-        $max_page = intval($count / self::COUNT_PER_PAGE);
-
-        if ($count % self::COUNT_PER_PAGE != 0) {
-            $max_page ++;
-        }
-        if ($page > $max_page) {
-            $page = $max_page;
-        }
-        FW\Tpl::assign('max_page', $max_page);
-        FW\Tpl::assign('page', $page);
-
-        try {
-            if ($path == '') {
-                $data = $repository->getCommits(null, ($page - 1) * self::COUNT_PER_PAGE, self::COUNT_PER_PAGE);
-            } else {
-                $data = $repository->getCommits($this->get_real_path($path), ($page - 1) * self::COUNT_PER_PAGE, self::COUNT_PER_PAGE);
-            }
-            FW\Tpl::assign('data', $data);
-        } catch (\RuntimeException $ex) {
-            return;
-        }
-    }
-
-    public function get_diff($commit_hash, $path) {
-        $repository = $this->get_Repository();
-        FW\Tpl::assign('commit_obj', null);
-        FW\Tpl::assign('file_obj', null);
-        if ($repository === null) {
-            return;
-        }
-        try {
-            $commit_obj = $repository->getCommit($commit_hash);
-            FW\Tpl::assign('commit_obj', $commit_obj);
-            if ($path != '') {
-                $file_obj = $repository->getFileChange($commit_hash, $this->get_real_path($path));
-                FW\Tpl::assign('file_obj', $file_obj);
-            }
-        } catch (\RuntimeException $ex) {
-            return;
-        }
     }
 
     public function get_book_name() {
@@ -266,22 +170,6 @@ class Book {
         ];
     }
 
-    public function get_real_path($path) {
-        return 'data/' . $path . '.md';
-    }
-
-    public function get_page_path($file) {
-//        if ($unescape) {
-//            $file = preg_replace_callback('/\\\\([0-8]{3})/', function($matches) {
-//                return chr(octdec($matches[1]));
-//            }, $file);
-//        }
-        if (strncmp($file, 'data', 4) === 0) {
-            return htmlspecialchars(substr(trim($file), 5, -3));
-        }
-        return htmlspecialchars($file);
-    }
-
     public function read_file($file) {
         if ($file === '') {
             return true;
@@ -294,7 +182,7 @@ class Book {
      *
      * @return \Gitter\Repository 版本库
      */
-    protected function get_Repository() {
+    public function get_Repository() {
         $dir = $this->root;
         $dir = FW\File::conv_to($dir, $this->fsencoding);
         $client = new \Gitter\Client();

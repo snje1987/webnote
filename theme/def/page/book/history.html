@@ -1,13 +1,12 @@
 <{use Org\Snje\Minifw as FW}>
 <{use Org\Snje\Webnote as WN}>
 <{inc header}>
+<{$url=$args->get_url()}>
 <div class="container-fluid">
-    <{$bookname=$args->get_book_name()}>
-    <{$cur_page=$args->get_cur_page()}>
     <ol class="breadcrumb breadcrumb">
         <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
         &nbsp;&nbsp;
-        <li><a href="/book/view/<{=$args->get_cur_path()}>">返回</a></li>
+        <li><a href="/book/view/<{=$url}>">返回</a></li>
     </ol>
 </div>
 <{inc system_menu $args}>
@@ -18,25 +17,25 @@
             <th>HASH</th>
             <th>说明</th>
         </tr>
-        <{foreach $data $commit}>
+        <{foreach $data['historys'] $commit}>
         <tr>
             <td><{=$commit->getDate()->format('Y-m-d H:i:s')}></td>
-            <td><a href="/book/diff/<{=$commit->getHash()}>/<{=$book_name}>/<{=$page_path}>?from=<{=$page}>"><{=$commit->getHash()}></a></td>
+            <td><a href="/book/diff/<{=$commit->getHash()}>/<{=$url}>?from=<{=$data['page']}>"><{=$commit->getHash()}></a></td>
             <td><{=$commit->getMessage()}></td>
         </tr>
         <{/foreach}>
     </table>
     <nav aria-label="...">
         <ul class="pager">
-            <{if $page <= 1}>
+            <{if $data['page'] <= 1}>
             <li class="disabled"><a href="javascript:void(0);">上一页</a></li>
             <{else}>
-            <li><a href="/book/history/<{=$page-1}>/<{=$book_name}>/<{=$page_path}>">上一页</a></li>
+            <li><a href="/book/history/<{=$data['page']-1}>/<{=$url}>">上一页</a></li>
             <{/if}>
-            <{if $page >= $max_page}>
+            <{if $data['page'] >= $data['max_page']}>
             <li class="disabled"><a href="javascript:void(0);">下一页</a></li>
             <{else}>
-            <li><a href="/book/history/<{=$page+1}>/<{=$book_name}>/<{=$page_path}>">下一页</a></li>
+            <li><a href="/book/history/<{=$data['page']+1}>/<{=$url}>">下一页</a></li>
             <{/if}>
 
         </ul>

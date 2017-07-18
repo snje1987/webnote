@@ -48,6 +48,7 @@ class BookPage {
         'F' => 'file',
         'V' => 'view',
     ];
+    const COUNT_PER_PAGE = 20;
 
     /**
      * @param \Org\Snje\Webnote\Model\Book $book
@@ -106,6 +107,23 @@ class BookPage {
             return $this->book_obj->get_book_name() . '/' . $path;
         }
         return $this->book_obj->get_book_name();
+    }
+
+    public function get_file_path() {
+        $path = $this->get_path();
+        return $this->root . 'data/' . $path . '.md';
+    }
+
+    public function get_page_path($file) {
+//        if ($unescape) {
+//            $file = preg_replace_callback('/\\\\([0-8]{3})/', function($matches) {
+//                return chr(octdec($matches[1]));
+//            }, $file);
+//        }
+        if (strncmp($file, 'data', 4) === 0) {
+            return htmlspecialchars(substr(trim($file), 5, -3));
+        }
+        return htmlspecialchars($file);
     }
 
     public function get_node_name() {
@@ -262,6 +280,18 @@ class BookPage {
         return $str;
     }
 
+    public function get_raw() {
+        if (!$this->is_page()) {
+            return '';
+        }
+        $path = $this->get_file_path();
+        if (!FW\File::call('is_file', $path, $this->fsencoding)) {
+            return '';
+        }
+        $str = FW\File::get_content($path, $this->fsencoding);
+        return $str;
+    }
+
     /**
      * @return array
      */
@@ -297,6 +327,79 @@ class BookPage {
             return $parent->get_file_list();
         }
         return [];
+    }
+
+    public function get_history($page) {
+        $repository = $this->book_obj->get_Repository();
+        if ($repository === null) {
+            throw new FW\Exception();
+        }
+        $page = intval($page);
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        $file = null;
+        if ($this->is_page()) {
+            $file = $this->get_file_path();
+        }
+
+        $count = $repository->getTotalCommits($file);
+        $max_page = intval($count / self::COUNT_PER_PAGE);
+
+        if ($count % self::COUNT_PER_PAGE != 0) {
+            $max_page ++;
+        }
+        if ($page > $max_page) {
+            $page = $max_page;
+        }
+        $data = [];
+        try {
+            $data = $repository->getCommits($file, ($page - 1) * self::COUNT_PER_PAGE, self::COUNT_PER_PAGE);
+        } catch (\RuntimeException $ex) {
+            $data = [];
+        }
+        return [
+            'historys' => $data,
+            'max_page' => $max_page,
+            'page' => $page,
+        ];
+    }
+
+    public function get_diff($commit_hash) {
+        $repository = $this->book_obj->get_Repository();
+        if ($repository === null) {
+            throw new FW\Exception();
+        }
+        try {
+            $file = null;
+            if ($this->is_page()) {
+                $file = $this->get_file_path();
+            }
+            return $repository->getCommit($commit_hash, $file);
+        } catch (\RuntimeException $ex) {
+            return;
+        }
+    }
+
+    public function edit($content, $msg) {
+        if (!$this->is_page()) {
+            return false;
+        }
+        $path = $this->get_file_path();
+        if (!FW\File::call('is_file', $path, $this->fsencoding)) {
+            return false;
+        }
+
+        $content = str_replace("\r", '', $content);
+        if (substr($content, -1, 1) != "\n") {
+            $content .= "\n";
+        }
+
+        if (!FW\File::put_content($path, $content, $this->fsencoding)) {
+            return false;
+        }
+        return $this->book_obj->git_cmd('commit', $msg);
     }
 
 }

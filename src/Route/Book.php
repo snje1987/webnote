@@ -40,16 +40,12 @@ class Book extends BaseRoute {
      * @route(prev=true)
      */
     private function c_view($args) {
-        $book_url = Site\Model\BookUrl::create($args);
-        if ($book_url == null) {
-            $this->show_last_page();
-        }
-        $book_obj = Site\Model\Book::create($book_url);
+        $book_obj = Site\Model\BookUtils::get_book_from_url($args);
         if ($book_obj == null) {
             $this->show_last_page();
         }
         try {
-            $page_obj = $book_obj->get_page($book_url, true);
+            $page_obj = Site\Model\BookUtils::get_page_from_url($args, true);
             if ($page_obj == null) {
                 $this->show_last_page();
             }
@@ -65,25 +61,19 @@ class Book extends BaseRoute {
      * @route(prev=true)
      */
     private function c_edit($args) {
-
         if ($_POST) {
             FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::edit_page');
         }
-        $system_obj = Site\Model\System::get();
-        $info = $this->path_info($args);
-        $books = $system_obj->get_booklist();
         try {
-            if (!isset($books[$info[0]])) {
-                FW\Server::redirect('/');
+            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            if ($page_obj == null) {
+                $this->show_last_page();
             }
-            $book_obj = new Site\Model\Book($books[$info[0]]['path']);
-            $book_obj->step_into($info[1]);
-            FW\Tpl::prepend('title', $info[0] . '/' . $info[1] . '-');
-            FW\Tpl::assign('breadcrumb', $book_obj->get_breadcrumb());
-            $system_obj->enable_book($info[0]);
-            FW\Tpl::display('/book/edit', $book_obj);
+            FW\Tpl::prepend('title', '[编辑页面]-' . $page_obj->get_url() . '-');
+            FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
+            FW\Tpl::display('/book/edit', $page_obj);
         } catch (FW\Exception $ex) {
-            FW\Server::redirect('/');
+            $this->show_last_page();
         }
     }
 
@@ -91,21 +81,12 @@ class Book extends BaseRoute {
      * @route(prev=true)
      */
     private function c_list($args) {
-        $book_url = Site\Model\BookUrl::create($args);
-        if ($book_url == null) {
-            FW\Server::redirect('/');
-        }
-        $book_obj = Site\Model\Book::create($book_url);
-        if ($book_obj == null) {
-            FW\Server::redirect('/');
-        }
-
-        $page_obj = $book_obj->get_page($book_url);
+        $page_obj = Site\Model\BookUtils::get_page_from_url($args);
         if ($page_obj == null) {
-            FW\Server::redirect('/');
+            die();
         }
         if ($page_obj->is_null()) {
-            FW\Server::redirect('/');
+            die();
         }
 
         if ($page_obj->is_root()) {
@@ -140,34 +121,23 @@ class Book extends BaseRoute {
      */
     private function c_history($args) {
         $matches = [];
-        if (!preg_match('/^(\d+)\/([^\/]+)(\/(.*))?$/', $args, $matches)) {
+        if (!preg_match('/^(\d+)\/(.+)?$/', $args, $matches)) {
             $this->show_last_page();
         }
         $hist_page = intval($matches[1]);
-        $book_name = strval($matches[2]);
-        $page_path = '';
-        if (isset($matches[4])) {
-            $page_path = strval($matches[4]);
-        }
-        $system_obj = Site\Model\System::get();
-        $books = $system_obj->get_booklist();
+        $url = strval($matches[2]);
+
         try {
-            if (!isset($books[$book_name])) {
-                FW\Server::redirect('/');
+            $page_obj = Site\Model\BookUtils::get_page_from_url($url);
+            if ($page_obj == null) {
+                $this->show_last_page();
             }
-            $book_obj = new Site\Model\Book($books[$book_name]['path']);
-            if ($page_path != '') {
-                $book_obj->step_into($page_path);
-            }
-            $book_obj->get_history(intval($hist_page), $page_path);
-            FW\Tpl::assign('book_name', $book_name);
-            FW\Tpl::assign('page_path', $page_path);
-            FW\Tpl::prepend('title', '[历史记录]' . $book_name . '/' . $page_path . '-');
-            $system_obj->enable_book($book_name);
-            FW\Tpl::display('/book/history', $book_obj);
-        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
-            $system_obj->disable_book($book_name);
-            FW\Server::redirect('/');
+            $data = $page_obj->get_history($hist_page);
+            FW\Tpl::assign('data', $data);
+            FW\Tpl::prepend('title', '[历史记录]' . $page_obj->get_url() . '-');
+            FW\Tpl::display('/book/history', $page_obj);
+        } catch (FW\Exception $ex) {
+            $this->show_last_page();
         }
     }
 
@@ -176,50 +146,25 @@ class Book extends BaseRoute {
      */
     private function c_diff($args) {
         $matches = [];
-        if (!preg_match('/^([0-9a-f]+)\/([^\/]+)(\/(.*))?$/', $args, $matches)) {
+        if (!preg_match('/^([0-9a-f]+)\/(.*)?$/', $args, $matches)) {
             $this->show_last_page();
         }
         $commit_hash = strval($matches[1]);
-        $book_name = strval($matches[2]);
-        $page_path = '';
-        if (isset($matches[4])) {
-            $page_path = strval($matches[4]);
-        }
-        $system_obj = Site\Model\System::get();
-        $books = $system_obj->get_booklist();
+        $url = strval($matches[2]);
         try {
-            if (!isset($books[$book_name])) {
-                FW\Server::redirect('/');
+             $page_obj = Site\Model\BookUtils::get_page_from_url($url);
+            if ($page_obj == null) {
+                $this->show_last_page();
             }
-            $book_obj = new Site\Model\Book($books[$book_name]['path']);
-            if ($page_path != '') {
-                $book_obj->step_into($page_path);
-            }
-            $book_obj->get_diff($commit_hash, $page_path);
-            FW\Tpl::assign('book_name', $book_name);
-            FW\Tpl::assign('page_path', $page_path);
+            $commit_obj = $page_obj->get_diff($commit_hash);
+            FW\Tpl::assign('commit_obj', $commit_obj);
             $from = isset($_GET['from']) ? intval($_GET['from']) : 1;
             FW\Tpl::assign('from_page', $from);
-            FW\Tpl::prepend('title', '[查询修改]' . $book_name . '/' . $page_path . '-');
-            $system_obj->enable_book($book_name);
-            FW\Tpl::display('/book/diff', $book_obj);
-        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
-            $system_obj->disable_book($book_name);
-            FW\Server::redirect('/');
-        }
-    }
-
-    private function path_info($path) {
-        $matches = [];
-        if (!preg_match('/^([^\/]+)(\/(.*))?$/', $path, $matches)) {
+            FW\Tpl::prepend('title', '[查询修改]' . $page_obj->get_url() . '-');
+            FW\Tpl::display('/book/diff', $page_obj);
+        } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
-        $book = strval($matches[1]);
-        $page = '';
-        if (isset($matches[3])) {
-            $page = strval($matches[3]);
-        }
-        return [$book, $page];
     }
 
     private function show_last_page() {
