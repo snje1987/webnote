@@ -1,28 +1,58 @@
 <{use Org\Snje\Minifw as FW}>
 <{use Org\Snje\Webnote as WN}>
 <{$cur_path=$args->get_url()}>
+<{if $args->is_root()}>
+<div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
+    <a class="btn btn-success" href="/book/history/1/<{=$args->get_book_name()}>">历史记录</a>
+    <a class="btn btn-success ajax" href="/book/push/<{=$args->get_book_name()}>">推送更改</a>
+    <a class="btn btn-success ajax" href="/book/pull/<{=$args->get_book_name()}>">获取更新</a>
+</div>
+<{else}>
+<div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
+    <{if $args->is_dir()}>
+    <a class="btn btn-success ajax" href="/book/delpage/<{=$args->get_url()}>">删除目录</a>
+    <a class="btn btn-success ajax" href="/book/movedir/<{=$args->get_url()}>">移动目录</a>
+    <{elseif $args->is_page()}>
+    <a class="btn btn-success" href="/book/history/1/<{=$args->get_url()}>">历史记录</a>
+    <a class="btn btn-success" href="/book/edit/<{=$args->get_url()}>">修改页面</a>
+    <a class="btn btn-success ajax" href="/book/delpage/<{=$args->get_url()}>">删除页面</a>
+    <a class="btn btn-success ajax" href="/book/movepage/<{=$args->get_url()}>">移动页面</a>
+    <{/if}>
+    <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>">新增页面</a>
+    <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>">新增目录</a>
+</div>
+<{/if}>
+<div class="list-group">
 <{if $is_book}>
     <{foreach $books $k $v}>
         <{if $k == $cur_path}>
-        <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k}>"><{=$k}></a></li>
+        <a class="list-group-item list-group-item-danger" href="/book/view/<{=$k}>"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<{=$k}></a>
         <{else}>
-        <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<a href="/book/view/<{=$k}>"><{=$k}></a></li>
+        <a class="list-group-item list-group-item-info" href="/book/view/<{=$k}>"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<{=$k}></a>
         <{/if}>
     <{/foreach}>
 <{else}>
     <{foreach $list $v}>
     <{if $v->is_dir()}>
         <{if $v->get_url() == $cur_path}>
-        <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <a class="list-group-item list-group-item-danger" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         <{else}>
-        <li class="list-group-item list-group-item-info"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <a class="list-group-item list-group-item-info" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         <{/if}>
     <{else}>
         <{if $v->get_url() == $cur_path}>
-        <li class="list-group-item list-group-item-danger"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <a class="list-group-item list-group-item-danger" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         <{else}>
-        <li class="list-group-item list-group-item-text"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<a href="/book/view/<{=$v->get_url()}>"><{=$v->get_node_name()}></a></li>
+        <a class="list-group-item list-group-item-text" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         <{/if}>
     <{/if}>
     <{/foreach}>
 <{/if}>
+</div>
+<script type="text/javascript">
+(function($){
+    $(document).ready(function(){
+        $('.btn.ajax').ajax_link();
+    });
+})(jQuery);
+</script>
