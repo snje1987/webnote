@@ -1,0 +1,47 @@
+<{use Org\Snje\Minifw as FW}>
+<{use Org\Snje\Webnote as WN}>
+<{inc header}>
+<div class="container-fluid">
+    <{$bookname=$args->get_book_name()}>
+    <ol class="breadcrumb breadcrumb">
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
+        &nbsp;&nbsp;
+        <{foreach $breadcrumb $k $v}>
+        <li><a data-toggle="modal" data-target="#listModal" href="#" data-path="/book/filelist/<{=$v['path']}>"><{=$v['name']}></a></li>
+        <{/foreach}>
+    </ol>
+</div>
+<{inc system_menu $args}>
+<div class="container-fluid">
+    <{if $args->is_dir()}>
+    <div class="btn-toolbar">
+        <a class="btn btn-success" href="/book/delfiledir/<{=$args->get_url()}>">删除目录</a>
+        <a class="btn btn-success" href="/book/addfiledir/<{=$args->get_url()}>">新目录</a>
+        <a class="btn btn-success" href="/book/addfile/<{=$args->get_url()}>">新文件</a>
+    </div>
+    <br />
+    <div class="list-group">
+        <{foreach $list $file}>
+        <a class="list-group-item" href="/book/fileview/<{=$file->get_url()}>">
+            <{if $file->is_file()}>
+            <span class="glyphicon glyphicon-file"></span>
+            <{elseif $file->is_dir()}>
+            <span class="glyphicon glyphicon-folder-open"></span>
+            <{/if}>
+            &nbsp;&nbsp;<{=$file->get_node_name()}>
+        </a>
+        <{/foreach}>
+    </div>
+    <{elseif $args->is_file()}>
+    <div class="btn-toolbar">
+        <a class="btn btn-success" href="/book/delfile/<{=$args->get_url()}>">删除文件</a>
+    </div>
+    <br />
+        <{if $args->is_image()}>
+        <img src="\book/file/<{=$args->get_url()}>" />
+        <{else}>
+        <div class="alert alert-info">非图片文件，无法预览</div>
+        <{/if}>
+    <{/if}>
+</div>
+<{inc footer}>

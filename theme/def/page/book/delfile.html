@@ -1,0 +1,32 @@
+<{use Org\Snje\Minifw as FW}>
+<{use Org\Snje\Webnote as WN}>
+<{inc header}>
+<div class="container-fluid">
+    <ol class="breadcrumb breadcrumb">
+        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#systemMenu"><span class="glyphicon glyphicon-cog"></span></button>
+        &nbsp;&nbsp;
+        <{foreach $breadcrumb $k $v}>
+        <li><a data-toggle="modal" data-target="#listModal" href="#" data-path="/book/filelist/<{=$v['path']}>"><{=$v['name']}></a></li>
+        <{/foreach}>
+    </ol>
+</div>
+<{inc system_menu $args}>
+<form class="fsubmit" action="/book/delfile/" method="post" enctype="multipart/form-data" role="form">
+<div class="container-fluid">
+    <div id="editor">
+        <input type="text" class="form-control" name="msg" placeholder="请输入删除说明"/>
+        <br />
+        <button type="submit" class="btn btn-success btn-block">确认删除</button>
+        <input type="hidden" name="file" value="<{=$args->get_url()}>" />
+        <input type="hidden" name="returl" value="/book/fileview/<{=$args->get_url()}>" />
+    </div>
+</div>
+ </form>
+<script type="text/javascript">
+(function($){
+    $(document).ready(function(){
+        $('.fsubmit').fsubmit();
+    });
+})(jQuery);
+</script>
+<{inc footer}>

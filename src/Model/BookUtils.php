@@ -56,6 +56,33 @@ class BookUtils {
         }
     }
 
+    public static function addfile($post) {
+        if (!isset($post['dir'])) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($post['msg']) || $post['msg'] == '') {
+            throw new FW\Exception('修改说明不能为空');
+        }
+        $file_obj = self::get_file_from_url($post['dir']);
+        if ($file_obj == null || !$file_obj->is_dir()) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($_FILES) || !isset($_FILES['file'])) {
+            throw new FW\Exception('非法操作');
+        }
+        $name = FW\File::get_name($_FILES['file'], true);
+        try {
+            $new_file = new BookFile(
+                    $file_obj->get_book()
+                    , $file_obj->get_path() . '/' . $name);
+            return $new_file->upload($_FILES['file'], $post['msg']);
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
     public static function adddir($post) {
         if (!isset($post['dir'])) {
             throw new FW\Exception('非法操作');
@@ -73,6 +100,30 @@ class BookUtils {
                     $page_obj->get_book()
                     , $page_obj->get_path() . '/' . strval($post['name']));
             return $new_page->adddir();
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function addfiledir($post) {
+        if (!isset($post['dir'])) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($post['name']) || $post['name'] == '') {
+            throw new FW\Exception('目录名称不能为空');
+        }
+        $file_obj = self::get_file_from_url($post['dir']);
+        if ($file_obj == null || !$file_obj->is_dir()) {
+            throw new FW\Exception('非法操作');
+        }
+
+        try {
+            $new_dir = new BookFile(
+                    $file_obj->get_book()
+                    , $file_obj->get_path() . '/' . strval($post['name']));
+            return $new_dir->adddir();
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -121,6 +172,26 @@ class BookUtils {
         }
     }
 
+    public static function delfile($post) {
+        if (!isset($post['file'])) {
+            throw new FW\Exception('非法操作');
+        }
+        if (!isset($post['msg']) || $post['msg'] == '') {
+            throw new FW\Exception('修改说明不能为空');
+        }
+        $file_obj = self::get_file_from_url($post['file']);
+        if ($file_obj == null || !$file_obj->is_file()) {
+            throw new FW\Exception('非法操作');
+        }
+        try {
+            return $file_obj->delete($post['msg']);
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
     public static function deldir($post) {
         if (!isset($post['dir'])) {
             throw new FW\Exception('非法操作');
@@ -131,6 +202,23 @@ class BookUtils {
         }
         try {
             return $page_obj->delete();
+        } catch (FW\Exception $ex) {
+            throw $ex;
+        } catch (\RuntimeException $ex) {
+            throw new FW\Exception('操作失败');
+        }
+    }
+
+    public static function delfiledir($post) {
+        if (!isset($post['dir'])) {
+            throw new FW\Exception('非法操作');
+        }
+        $file_obj = self::get_file_from_url($post['dir']);
+        if ($file_obj == null || !$file_obj->is_dir()) {
+            throw new FW\Exception('非法操作');
+        }
+        try {
+            return $file_obj->delete();
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -205,7 +293,7 @@ class BookUtils {
     /**
      * @return \Org\Snje\Webnote\Model\BookFile
      */
-    public static function get_file_from_url($url, $allow_null = false) {
+    public static function get_file_from_url($url, $allow_suggest = false, $allow_null = false) {
         $book_url = Site\Model\BookUrl::create(strval($url));
         if ($book_url == null) {
             return null;
@@ -214,8 +302,10 @@ class BookUtils {
         if ($book_obj == null) {
             return null;
         }
-        if ($allow_null) {
-            return new BookFile($book_obj, $book_url->get_page());
+        if ($allow_suggest) {
+            return $book_obj->get_file($book_url, $allow_suggest);
+        } elseif ($allow_null) {
+            return new BookPage($book_obj, $book_url->get_page());
         }
         return $book_obj->get_file($book_url);
     }

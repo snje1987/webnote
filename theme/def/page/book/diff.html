@@ -70,14 +70,14 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <span class="label label-success">新建</span>
-                        <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getNew(),4),"\""),2))}></span>
+                        <span class="label label-default"><{=$args->get_page_path(trim($diff->getFile()))}></span>
                     </h3>
                 </div>
                 <{elseif strncmp($lines[0]->getLine(),'deleted file mode', 17) === 0}>
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <span class="label label-danger">删除</span>
-                        <span class="label label-default"><{=$args->get_page_path(substr(trim(substr($diff->getOld(),4),"\""),2))}></span>
+                        <span class="label label-default"><{=$args->get_page_path(trim($diff->getFile()))}></span>
                     </h3>
                 </div>
                 <{elseif $lines[0]->getType() == 'chunk'}>

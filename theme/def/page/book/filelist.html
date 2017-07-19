@@ -1,0 +1,53 @@
+<{use Org\Snje\Minifw as FW}>
+<{use Org\Snje\Webnote as WN}>
+<{$cur_path=$args->get_url()}>
+<{if $args->is_root()}>
+<div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
+    <a class="btn btn-success" href="/book/history/1/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-list-alt"></span>
+    </a>
+    <a class="btn btn-success" href="/book/view/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-file"></span>
+    </a>
+    <a class="btn btn-success ajax" href="/book/push/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-cloud-upload"></span>
+    </a>
+    <a class="btn btn-success ajax" href="/book/pull/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-cloud-download"></span>
+    </a>
+</div>
+<{/if}>
+<div class="list-group">
+<{if $is_book}>
+    <{foreach $books $k $v}>
+        <{if $k == $cur_path}>
+        <a class="list-group-item list-group-item-danger" href="/book/fileview/<{=$k}>"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<{=$k}></a>
+        <{else}>
+        <a class="list-group-item list-group-item-info" href="/book/fileview/<{=$k}>"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<{=$k}></a>
+        <{/if}>
+    <{/foreach}>
+<{else}>
+    <{foreach $list $v}>
+    <{if $v->is_dir()}>
+        <{if $v->get_url() == $cur_path}>
+        <a class="list-group-item list-group-item-danger" href="/book/fileview/<{=$v->get_url()}>"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <{else}>
+        <a class="list-group-item list-group-item-info" href="/book/fileview/<{=$v->get_url()}>"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <{/if}>
+    <{else}>
+        <{if $v->get_url() == $cur_path}>
+        <a class="list-group-item list-group-item-danger" href="/book/fileview/<{=$v->get_url()}>"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <{else}>
+        <a class="list-group-item list-group-item-text" href="/book/fileview/<{=$v->get_url()}>"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <{/if}>
+    <{/if}>
+    <{/foreach}>
+<{/if}>
+</div>
+<script type="text/javascript">
+(function($){
+    $(document).ready(function(){
+        $('.btn.ajax').ajax_link();
+    });
+})(jQuery);
+</script>

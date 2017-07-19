@@ -81,9 +81,11 @@ class BookPage extends BookNode {
 //                return chr(octdec($matches[1]));
 //            }, $file);
 //        }
-        if (strncmp($file, 'data', 4) === 0) {
-            return htmlspecialchars(substr(trim($file), 5, -3));
-        }
+        //if (strncmp($file, 'data', 4) === 0) {
+        //    return htmlspecialchars(substr(trim($file), 5, -3));
+        //} elseif (strncmp($file, 'file', 4) === 0) {
+        //    return htmlspecialchars(substr(trim($file), 5));
+        //}
         return htmlspecialchars($file);
     }
 

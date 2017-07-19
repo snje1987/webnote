@@ -52,4 +52,31 @@ class BookFile extends BookNode {
         return $this->root . 'file/' . $path;
     }
 
+    public function is_image() {
+        $path = $this->get_real_path();
+        $types = '.gif|.jpeg|.png|.bmp|.jpg|.svg'; //定义检查的图片类型
+        if (file_exists($path)) {
+            $ext = pathinfo($path, PATHINFO_EXTENSION);
+            return stripos($types, $ext);
+        } else {
+            return false;
+        }
+    }
+
+    public function upload($file, $msg) {
+        if (empty($file)) {
+            return false;
+        }
+        if ($file['error'] != 0) {
+            return false;
+        }
+        $path = $this->get_real_path();
+        FW\File::mkdir(dirname($path));
+        if (\move_uploaded_file($file['tmp_name'], $path)) {
+            return $this->book_obj->git_cmd('commit', $msg);
+        } else {
+            return false;
+        }
+    }
+
 }

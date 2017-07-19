@@ -106,13 +106,19 @@ class Book {
      * @param \Org\Snje\Webnote\Model\BookUrl $url
      * @return \Org\Snje\Webnote\Model\BookFile
      */
-    public function get_file($url) {
-        $page = $url->get_page();
-        $page = new BookFile($this, $page);
-        if ($page->is_null()) {
+    public function get_file($url, $allow_suggest = false) {
+        $file_obj = $url->get_page();
+        $file_obj = new BookFile($this, $file_obj);
+        if ($file_obj->is_null()) {
+            if ($allow_suggest) {
+                $parent = $file_obj->get_parent();
+                if ($parent != null) {
+                    throw new FW\Exception($parent->get_path());
+                }
+            }
             return null;
         }
-        return $page;
+        return $file_obj;
     }
 
     public function get_book_root() {
