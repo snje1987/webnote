@@ -58,20 +58,6 @@ abstract class BookNode {
             $this->dir = '';
             $this->file = '';
             $this->type = self::TYPE_DIR;
-        } elseif (FW\File::call(
-                        'is_file'
-                        , $this->root . 'data/' . $path . '.md'
-                        , $this->fsencoding)) {
-            $this->file = trim(BookUtils::basename($path), '/');
-            $this->dir = trim(BookUtils::dirname($path), '/');
-            $this->type = self::TYPE_FILE;
-        } else if (FW\File::call(
-                        'is_dir'
-                        , $this->root . 'data/' . $path
-                        , $this->fsencoding)) {
-            $this->dir = trim($path, '/');
-            $this->file = '';
-            $this->type = self::TYPE_DIR;
         } else {
             $this->file = trim(BookUtils::basename($path), '/');
             $this->dir = trim(BookUtils::dirname($path), '/');

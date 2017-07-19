@@ -48,6 +48,20 @@ class BookPage extends BookNode {
      */
     public function __construct($book, $page) {
         parent::__construct($book, $page);
+        $path = $this->get_path();
+        if (FW\File::call(
+                        'is_file'
+                        , $this->root . 'data/' . $path . '.md'
+                        , $this->fsencoding)) {
+            $this->type = self::TYPE_FILE;
+        } else if (FW\File::call(
+                        'is_dir'
+                        , $this->root . 'data/' . $path
+                        , $this->fsencoding)) {
+            $this->dir = trim($path, '/');
+            $this->file = '';
+            $this->type = self::TYPE_DIR;
+        }
     }
 
 
