@@ -38,7 +38,7 @@ class Book {
                 return null;
             }
             $book_obj = new self($books[$book_name]['path']);
-            $system_obj->disable_book($book_name);
+            $system_obj->enable_book($book_name);
             return $book_obj;
         } catch (FW\Exception $ex) {
             $system_obj->disable_book($book_name);
