@@ -202,6 +202,24 @@ class BookUtils {
         return $book_obj->get_page($book_url);
     }
 
+    /**
+     * @return \Org\Snje\Webnote\Model\BookFile
+     */
+    public static function get_file_from_url($url, $allow_null = false) {
+        $book_url = Site\Model\BookUrl::create(strval($url));
+        if ($book_url == null) {
+            return null;
+        }
+        $book_obj = Site\Model\Book::create($book_url);
+        if ($book_obj == null) {
+            return null;
+        }
+        if ($allow_null) {
+            return new BookFile($book_obj, $book_url->get_page());
+        }
+        return $book_obj->get_file($book_url);
+    }
+
     public static function dirname($page) {
         $page = \dirname($page);
         if ($page == '.') {

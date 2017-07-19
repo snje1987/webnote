@@ -19,21 +19,15 @@ class Book extends BaseRoute {
      * @route(prev=true)
      */
     protected function c_file($args) {
-        $info = $this->path_info($args);
-        $system_obj = Site\Model\System::get();
-        $books = $system_obj->get_booklist();
         try {
-            $book = $info[0];
-            $file = $info[1];
-            if (!isset($books[$book])) {
-                die();
+            $file_obj = Site\Model\BookUtils::get_file_from_url($args);
+            if ($file_obj != null) {
+                die($file_obj->get_file_content());
             }
-            $book_obj = new Site\Model\Book($books[$book]['path']);
-            $book_obj->read_file($file);
-        } catch (FW\Exception $ex) {//只有笔记本不存在的时候才会抛出异常
-            $system_obj->disable_book($info[0]);
-            die();
+        } catch (FW\Exception $ex) {
+
         }
+        die();
     }
 
     /**

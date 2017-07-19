@@ -99,6 +99,22 @@ class Book {
         }
     }
 
+
+    /**
+     * 返回一个文件，如果不存在则返回null
+     *
+     * @param \Org\Snje\Webnote\Model\BookUrl $url
+     * @return \Org\Snje\Webnote\Model\BookFile
+     */
+    public function get_file($url) {
+        $page = $url->get_page();
+        $page = new BookFile($this, $page);
+        if ($page->is_null()) {
+            return null;
+        }
+        return $page;
+    }
+
     public function get_book_root() {
         return $this->root;
     }
@@ -137,48 +153,6 @@ class Book {
 
     public function get_book_name() {
         return $this->data['name'];
-    }
-
-    public function get_list() {
-        $dir = $this->cur_dir;
-        if ($dir != '') {
-            $dir .= '/';
-        }
-
-        $path = $this->root . 'data/' . $dir;
-        $list = FW\File::ls($path, '.md', false, $this->fsencoding);
-
-        usort($list, __NAMESPACE__ . '\Book::comp_pagefirst');
-        $pages = [];
-        $dirs = [];
-        foreach ($list as $v) {
-            if ($v['dir'] === true) {
-                $dirs[] = [
-                    'name' => $v['name'],
-                    'path' => $this->data['name'] . '/' . $dir . $v['name'],
-                ];
-            } else {
-                if (strlen($v['name']) > 3 && substr($v['name'], -3) === '.md') {
-                    $page = substr($v['name'], 0, strlen($v['name']) - 3);
-                    $pages[] = [
-                        'name' => $page,
-                        'path' => $this->data['name'] . '/' . $dir . $page,
-                    ];
-                }
-            }
-        }
-        return [
-            'pages' => $pages,
-            'dirs' => $dirs,
-        ];
-    }
-
-    public function read_file($file) {
-        if ($file === '') {
-            return true;
-        }
-        $path = $this->root . 'file/' . $file;
-        FW\File::readfile($path, $this->fsencoding);
     }
 
     /**
