@@ -14,7 +14,7 @@
 <form class="fsubmit" action="/book/edit/" method="post" enctype="multipart/form-data" role="form">
 <div class="container-fluid">
     <div id="editor">
-        <textarea name="content" class="form-control" rows="20"><{=htmlspecialchars($args->get_raw())}></textarea>
+        <textarea name="content" class="form-control" rows="20"><{=htmlspecialchars($args->get_file_content())}></textarea>
         <br />
         <input type="text" class="form-control" name="msg" placeholder="请输入修改说明"/>
         <br />

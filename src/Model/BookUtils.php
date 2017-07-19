@@ -88,7 +88,7 @@ class BookUtils {
             throw new FW\Exception('修改说明不能为空');
         }
         $page_obj = self::get_page_from_url($post['page']);
-        if ($page_obj == null || !$page_obj->is_page()) {
+        if ($page_obj == null || !$page_obj->is_file()) {
             throw new FW\Exception('非法操作');
         }
 
@@ -109,7 +109,7 @@ class BookUtils {
             throw new FW\Exception('修改说明不能为空');
         }
         $page_obj = self::get_page_from_url($post['page']);
-        if ($page_obj == null || !$page_obj->is_page()) {
+        if ($page_obj == null || !$page_obj->is_file()) {
             throw new FW\Exception('非法操作');
         }
         try {

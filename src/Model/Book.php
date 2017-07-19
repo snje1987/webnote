@@ -71,7 +71,7 @@ class Book {
         $page = $url->get_page();
 
         $page = new BookPage($this, $page);
-        if ($page->is_page()) {
+        if ($page->is_file()) {
             return $page;
         }
 

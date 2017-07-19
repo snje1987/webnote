@@ -6,11 +6,14 @@
     <a class="btn btn-success" href="/book/history/1/<{=$args->get_book_name()}>">
         <span class="glyphicon glyphicon-list-alt"></span>
     </a>
+    <a class="btn btn-success" href="/book/filelist/<{=$args->get_book_name()}>">
+        <span class="glyphicon glyphicon-picture"></span>
+    </a>
     <a class="btn btn-success ajax" href="/book/push/<{=$args->get_book_name()}>">
-        <span class="glyphicon glyphicon-upload"></span>
+        <span class="glyphicon glyphicon-cloud-upload"></span>
     </a>
     <a class="btn btn-success ajax" href="/book/pull/<{=$args->get_book_name()}>">
-        <span class="glyphicon glyphicon-download"></span>
+        <span class="glyphicon glyphicon-cloud-download"></span>
     </a>
 </div>
 <{else}>
@@ -19,7 +22,7 @@
     <a class="btn btn-success" href="/book/deldir/<{=$args->get_url()}>">
         <span class="glyphicon glyphicon glyphicon-minus"></span>
     </a>
-    <{elseif $args->is_page()}>
+    <{elseif $args->is_file()}>
     <a class="btn btn-success" href="/book/history/1/<{=$args->get_url()}>">
         <span class="glyphicon glyphicon-list-alt"></span>
     </a>
@@ -31,10 +34,10 @@
     </a>
     <{/if}>
     <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-folder-open"></span><
+        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-file"></span><
         /a>
     <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-file"></span>
+        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-folder-open"></span>
     </a>
 </div>
 <{/if}>

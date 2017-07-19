@@ -96,7 +96,7 @@ class Book extends BaseRoute {
             FW\Tpl::assign('books', $books);
         } else {
             FW\Tpl::assign('is_book', false);
-            $siblings = $page_obj->get_siblings();
+            $siblings = $page_obj->get_siblings_nodes('.md', 'Org\\Snje\\Webnote\\Model\\Buulutils::cmp_dirfirst');
             FW\Tpl::assign('list', $siblings);
         }
         FW\Tpl::display('/book/list', $page_obj);
@@ -177,7 +177,7 @@ class Book extends BaseRoute {
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
-            if ($page_obj == null || !$page_obj->is_page()) {
+            if ($page_obj == null || !$page_obj->is_file()) {
                 $this->show_last_page();
             }
             FW\Tpl::prepend('title', '[移动页面]-' . $page_obj->get_url() . '-');
@@ -254,7 +254,7 @@ class Book extends BaseRoute {
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
-            if ($page_obj == null || !$page_obj->is_page()) {
+            if ($page_obj == null || !$page_obj->is_file()) {
                 $this->show_last_page();
             }
             FW\Tpl::prepend('title', '[删除页面]-' . $page_obj->get_url() . '-');

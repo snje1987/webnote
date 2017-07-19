@@ -27,23 +27,14 @@ use Org\Snje\Webnote as Site;
  *
  * @author Yang Ming <yangming0116@163.com>
  */
-class BookPage {
+class BookPage extends BookNode {
 
     /**
      *
      * @var \Org\Snje\Webnote\Model\Book
      */
-    protected $book_obj;
-    protected $dir;
-    protected $page;
-    protected $root;
-    protected $type = self::TYPE_NULL;
-    protected $fsencoding;
     public static $always_compile;
 
-    const TYPE_NULL = 0;
-    const TYPE_PAGE = 1;
-    const TYPE_DIR = 2;
     const LINK_METHOD = [
         'F' => 'file',
         'V' => 'view',
@@ -56,63 +47,13 @@ class BookPage {
      * @return \Org\Snje\Webnote\Model\BookPage
      */
     public function __construct($book, $page) {
-        $page = str_replace('..', '', $page);
-        $this->book_obj = $book;
-        $this->root = $this->book_obj->get_book_root();
-        $this->fsencoding = $this->book_obj->get_fsencoding();
-        if ($page == '') {
-            $this->dir = '';
-            $this->page = '';
-            $this->type = self::TYPE_DIR;
-        } elseif (FW\File::call(
-                        'is_file'
-                        , $this->root . 'data/' . $page . '.md'
-                        , $this->fsencoding)) {
-            $this->page = trim(BookUtils::basename($page), '/');
-            $this->dir = trim(BookUtils::dirname($page), '/');
-            $this->type = self::TYPE_PAGE;
-        } else if (FW\File::call(
-                        'is_dir'
-                        , $this->root . 'data/' . $page
-                        , $this->fsencoding)) {
-            $this->dir = trim($page, '/');
-            $this->page = '';
-            $this->type = self::TYPE_DIR;
-        } else {
-            $this->page = trim(BookUtils::basename($page), '/');
-            $this->dir = trim(BookUtils::dirname($page), '/');
-            $this->type = self::TYPE_NULL;
-        }
+        parent::__construct($book, $page);
     }
 
-    public function get_dir() {
-        return $this->dir;
-    }
 
-    public function get_page() {
-        return $this->page;
-    }
-
-    public function get_path() {
-        if ($this->dir != '' && $this->page != '') {
-            return $this->dir . '/' . $this->page;
-        } elseif ($this->dir != '') {
-            return $this->dir;
-        }
-        return $this->page;
-    }
-
-    public function get_url() {
+    public function get_real_path() {
         $path = $this->get_path();
-        if ($path != '') {
-            return $this->book_obj->get_book_name() . '/' . $path;
-        }
-        return $this->book_obj->get_book_name();
-    }
-
-    public function get_file_path() {
-        $path = $this->get_path();
-        if ($this->is_page()) {
+        if ($this->is_file()) {
             return $this->root . 'data/' . $path . '.md';
         }
         else {
@@ -132,100 +73,11 @@ class BookPage {
         return htmlspecialchars($file);
     }
 
-    public function get_node_name() {
-        if ($this->type == self::TYPE_PAGE || $this->type == self::TYPE_NULL) {
-            return $this->get_page();
-        } elseif ($this->dir != '') {
-            return BookUtils::basename($this->dir);
-        }
-        return $this->get_book_name();
-    }
-
-    public function get_book_name() {
-        return $this->book_obj->get_book_name();
-    }
-
-    /**
-     * @return \Org\Snje\Webnote\Model\Book
-     */
-    public function get_book() {
-        return $this->book_obj;
-    }
-
-    public function is_page() {
-        return $this->type === self::TYPE_PAGE;
-    }
-
-    public function is_dir() {
-        return $this->type === self::TYPE_DIR;
-    }
-
-    public function is_null() {
-        return $this->type === self::TYPE_NULL;
-    }
-
-    public function is_root() {
-        return $this->dir == '' && $this->page == '';
-    }
-
     /**
      * @return \Org\Snje\Webnote\Model\BookPage
      */
     public function get_first_page() {
-        if ($this->type !== self::TYPE_DIR) {
-            return null;
-        }
-        $path = $this->root . 'data/' . $this->get_path();
-        $list = FW\File::ls($path, '.md', false, $this->fsencoding);
-        usort($list, __NAMESPACE__ . '\BookUtils::comp_pagefirst');
-        reset($list);
-        if (count($list) == 0) {
-            return null;
-        }
-        $v = current($list);
-        if ($v['dir']) {
-            return new BookPage($this->book_obj, $this->get_path() . '/' . $v['name']);
-        } else {
-            return new BookPage($this->book_obj, $this->get_path() . '/' . substr($v['name'], 0, -3));
-        }
-    }
-
-    /**
-     * @return \Org\Snje\Webnote\Model\BookPage
-     */
-    public function get_parent() {
-        if ($this->page != '') {
-            return new BookPage($this->book_obj, $this->dir);
-        } elseif ($this->dir != '') {
-            return new BookPage($this->book_obj, BookUtils::dirname($this->dir));
-        } else {
-            return null;
-        }
-    }
-
-    public function get_breadcrumb() {
-        $dir = $this->dir;
-        $book_name = $this->book_obj->get_book_name();
-        $data = [];
-        while ($dir != '' && $dir != '.' && $dir != '/') {
-            $data[] = [
-                'name' => BookUtils::basename($dir),
-                'path' => $book_name . '/' . $dir,
-            ];
-            $dir = BookUtils::dirname($dir);
-        }
-        $data[] = [
-            'name' => $book_name,
-            'path' => $book_name,
-        ];
-        $data = array_reverse($data);
-        if ($this->type == self::TYPE_PAGE) {
-            $data[] = [
-                'name' => $this->page,
-                'path' => $this->get_url(),
-            ];
-        }
-        return $data;
+        return $this->first_sub_node('.md', __NAMESPACE__ . '\BookUtils::comp_pagefirst');
     }
 
     /**
@@ -256,7 +108,7 @@ class BookPage {
     }
 
     public function get_content() {
-        if ($this->type != self::TYPE_PAGE) {
+        if (!$this->is_file()) {
             return null;
         }
         $path = $this->get_path();
@@ -289,55 +141,6 @@ class BookPage {
         return $str;
     }
 
-    public function get_raw() {
-        if (!$this->is_page()) {
-            return '';
-        }
-        $path = $this->get_file_path();
-        if (!FW\File::call('is_file', $path, $this->fsencoding)) {
-            return '';
-        }
-        $str = FW\File::get_content($path, $this->fsencoding);
-        return $str;
-    }
-
-    /**
-     * @return array
-     */
-    public function get_file_list() {
-        if (!$this->is_dir()) {
-            return [];
-        }
-        $path = $this->root . 'data/' . $this->get_path();
-        $list = FW\File::ls($path, '.md', false, $this->fsencoding);
-        $base = $this->get_path();
-
-        usort($list, __NAMESPACE__ . '\BookUtils::comp_dirfirst');
-        $ret = [];
-        foreach ($list as $v) {
-            if ($v['dir'] === true) {
-                $ret[] = new BookPage($this->book_obj, $base . '/' . $v['name']);
-            } else {
-                if (strlen($v['name']) > 3 && substr($v['name'], -3) === '.md') {
-                    $page = substr($v['name'], 0, strlen($v['name']) - 3);
-                    $ret[] = new BookPage($this->book_obj, $base . '/' . $page);
-                }
-            }
-        }
-        return $ret;
-    }
-
-    /**
-     * @return array
-     */
-    public function get_siblings() {
-        $parent = $this->get_parent();
-        if ($parent != null && $parent->is_dir()) {
-            return $parent->get_file_list();
-        }
-        return [];
-    }
-
     public function get_history($page) {
         $repository = $this->book_obj->get_Repository();
         if ($repository === null) {
@@ -349,8 +152,8 @@ class BookPage {
         }
 
         $file = null;
-        if ($this->is_page()) {
-            $file = $this->get_file_path();
+        if ($this->is_file()) {
+            $file = $this->get_real_path();
         }
 
         $count = $repository->getTotalCommits($file);
@@ -382,8 +185,8 @@ class BookPage {
         }
         try {
             $file = null;
-            if ($this->is_page()) {
-                $file = $this->get_file_path();
+            if ($this->is_file()) {
+                $file = $this->get_real_path();
             }
             return $repository->getCommit($commit_hash, $file);
         } catch (\RuntimeException $ex) {
@@ -392,10 +195,10 @@ class BookPage {
     }
 
     public function edit($content, $msg) {
-        if (!$this->is_page()) {
+        if (!$this->is_file()) {
             return false;
         }
-        $path = $this->get_file_path();
+        $path = $this->get_real_path();
         if (!FW\File::call('is_file', $path, $this->fsencoding)) {
             return false;
         }
@@ -415,7 +218,7 @@ class BookPage {
         if (!$this->is_null()) {
             return false;
         }
-        $path = $this->get_file_path() . '.md';
+        $path = $this->get_real_path() . '.md';
         if (FW\File::call('file_exists', $path, $this->fsencoding)) {
             return false;
         }
@@ -429,37 +232,6 @@ class BookPage {
             return false;
         }
         return $this->book_obj->git_cmd('commit', $msg);
-    }
-
-    public function adddir() {
-        if (!$this->is_null()) {
-            return false;
-        }
-        $path = $this->get_file_path();
-        if (FW\File::call('file_exists', $path, $this->fsencoding)) {
-            return false;
-        }
-        FW\File::mkdir($path, $this->fsencoding);
-        return true;
-    }
-
-    public function delete($msg = '') {
-        if ($this->is_page()) {
-            $path = $this->get_file_path();
-            FW\File::delete($path, true);
-            return $this->book_obj->git_cmd('commit', $msg);
-        }
-        elseif ($this->is_dir()) {
-            $list = $this->get_file_list();
-            if (!empty($list)) {
-                throw new FW\Exception('目录不为空');
-            }
-            $path = $this->get_file_path();
-            FW\File::delete($path, true);
-            return true;
-        } else {
-            return false;
-        }
     }
 
 }
