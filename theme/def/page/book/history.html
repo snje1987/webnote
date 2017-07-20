@@ -20,7 +20,7 @@
         <{foreach $data['historys'] $commit}>
         <tr>
             <td><{=$commit->getDate()->format('Y-m-d H:i:s')}></td>
-            <td><a href="/book/diff/<{=$commit->getHash()}>/<{=$url}>?from=<{=$data['page']}>"><{=$commit->getHash()}></a></td>
+            <td><a href="/book/diff/<{=$commit->getHash()}>/<{=$url}>?from=<{=$data['page']}>"><{=$commit->getShortHash()}></a></td>
             <td><{=$commit->getMessage()}></td>
         </tr>
         <{/foreach}>
