@@ -14,8 +14,9 @@
 <form class="fsubmit" action="/book/edit/" method="post" enctype="multipart/form-data" role="form">
 <div class="container-fluid">
     <div id="editor">
+        <div class="btn-toolbar" style="margin-bottom:5px;"></div>
         <textarea name="content" class="form-control" rows="20"><{=htmlspecialchars($args->get_file_content())}></textarea>
-        <br />
+        <div class="info" style="line-height:24px;"></div>
         <input type="text" class="form-control" name="msg" placeholder="请输入修改说明"/>
         <br />
         <button type="submit" class="btn btn-success btn-block">提交修改</button>
@@ -28,6 +29,10 @@
 (function($){
     $(document).ready(function(){
         $('.fsubmit').fsubmit();
+        $('textarea').myeditor({
+            'toolbar':'#editor .btn-toolbar',
+            'info':'#editor .info'
+        });
     });
 })(jQuery);
 </script>

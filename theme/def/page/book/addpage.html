@@ -15,9 +15,9 @@
 <div class="container-fluid">
     <div id="editor">
         <input type="text" class="form-control" name="name" placeholder="请输入页面名称"/>
-        <br />
+        <div class="btn-toolbar" style="margin:5px 0;"></div>
         <textarea name="content" class="form-control" rows="20"></textarea>
-        <br />
+        <div class="info" style="line-height:24px;"></div>
         <input type="text" class="form-control" name="msg" placeholder="请输入修改说明"/>
         <br />
         <button type="submit" class="btn btn-success btn-block">提交</button>
@@ -30,6 +30,10 @@
 (function($){
     $(document).ready(function(){
         $('.fsubmit').fsubmit();
+        $('textarea').myeditor({
+            'toolbar':'#editor .btn-toolbar',
+            'info':'#editor .info'
+        });
     });
 })(jQuery);
 </script>

@@ -139,6 +139,45 @@
             });
         });
     };//}}}
+    $.fn.myeditor = function (options) {//{{{
+        var defaults = {
+            toolbar: '',
+            info: ''
+        };
+        $.extend(defaults, defaults, options);
+        $(this).each(function (index) {
+            var $this = $(this);
+            var toolbar = '';
+            var info = '';
+            var calc_word = function () {
+                if (info === '') {
+                    return;
+                }
+                var str = $this.val();
+                str = str.replace(/(\s|　)/g, '');
+                info.html('当前字数：' + str.length);
+            };
+            if (defaults.info !== '') {
+                info = $(defaults.info).eq(index);
+                calc_word();
+                $this.keyup(function () {
+                    calc_word();
+                });
+            }
+            if (defaults.toolbar !== '') {
+                toolbar = $(defaults.toolbar).eq(index);
+                var autoformat = $('<a class="btn btn-success">整理格式</a>');
+                autoformat.click(function () {
+                    var str = $this.val();
+                    str = str.replace(/　/g, '');
+                    str = str.replace(/( |\t)+$/mg, '');
+                    $this.val(str);
+                    calc_word();
+                });
+                toolbar.append(autoformat);
+            }
+        });
+    };//}}}
     $.show_poprelay = function () {//{{{
         $('#poprelay').remove();
         $('body').append('<div id="poprelay"></div>');
