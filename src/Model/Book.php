@@ -144,6 +144,9 @@ class Book {
             if ($cmd == 'commit') {
                 $repository->addAll();
                 $repository->commit($args);
+                if (FW\Config::get('git', 'autopush', false)) {
+                    $repository->push("origin", "master");
+                }
             } elseif ($cmd == 'push') {
                 $repository->push("origin", "master");
             }
@@ -169,12 +172,11 @@ class Book {
         $dir = $this->root;
         $dir = FW\File::conv_to($dir, $this->fsencoding);
         $client = new \Gitter\Client();
-        $system_obj = System::get();
         try {
             $repository = $client->getRepository($dir);
             $repository->setConfig('core.quotepath', 'false');
-            $repository->setConfig('user.name', $system_obj->git_name);
-            $repository->setConfig('user.email', $system_obj->git_email);
+            $repository->setConfig('user.name', FW\Config::get('git', 'user'));
+            $repository->setConfig('user.email', FW\Config::get('git', 'email'));
             return $repository;
         } catch (\RuntimeException $ex) {
             return null;

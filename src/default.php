@@ -9,6 +9,12 @@ $cfg['main']['fsencoding'] = 'utf-8';
 
 $cfg['main']['auth'] = false;
 
+$cfg['git'] = [
+    'user' => '',
+    'email' => '',
+    'autopush' => false,
+];
+
 $cfg['main']['err_404'] = '/www/static/error/404.html';
 
 $cfg['book'] = [
