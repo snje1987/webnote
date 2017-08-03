@@ -106,7 +106,7 @@ class BookPage extends BookNode {
         }
 
         $method = $matches[1];
-        if (!isset(self::LINK_METHOD[$method])) {
+        if (!array_key_exists($method, self::LINK_METHOD)) {
             return $link;
         }
 
@@ -141,11 +141,11 @@ class BookPage extends BookNode {
         }
         $str = '';
         //只在更新后重新编译
-        if (self::$always_compile == 1 || $desttime == 0 || $desttime <= $srctime) {
+        if (self::$always_compile === 1 || $desttime == 0 || $desttime <= $srctime) {
             $str = FW\File::get_content($src, $this->fsencoding);
             $transform = new \Michelf\MarkdownExtra();
             $transform->url_filter_func = [$this, 'parse_link'];
-            $transform->custom_code_parser = __NAMESPACE__ . 'BookUtils::parse_codebock';
+            $transform->custom_code_parser = __NAMESPACE__ . '\\BookUtils::parse_codebock';
             $str = $transform->transform($str);
             FW\File::mkdir(dirname($dest), $this->fsencoding);
             FW\File::put_content($dest, $str, $this->fsencoding);
