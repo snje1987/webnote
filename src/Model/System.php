@@ -29,7 +29,17 @@ use Org\Snje\Minifw as FW;
  */
 class System {
 
-    use FW\Traits\OneInstance;
+    /**
+     * @var static the instance
+     */
+    protected static $_instance = null;
+
+    public static function get() {
+        if (self::$_instance === null) {
+            self::$_instance = new static();
+        }
+        return self::$_instance;
+    }
 
     private $last_page;
     private $password;
