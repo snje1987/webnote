@@ -1,38 +1,40 @@
 <?php
 
-/**
- * @filename Book.php
- * @encoding UTF-8
- * @author Yang Ming <yangming0116@163.com>
- * @datetime 2016-2-28  13:36:42
- * @Description
+/*
+ * Copyright (C) 2017 Yang Ming <yangming0116@163.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Route;
+namespace Org\Snje\Webnote\Controler;
 
 use Org\Snje\Minifw as FW;
 use Org\Snje\Webnote as Site;
 
-class Book extends BaseRoute {
+class Book extends Base {
 
-    /**
-     * @route(prev=true)
-     */
     protected function c_file($args) {
         try {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
             if ($file_obj != null && $file_obj->is_file()) {
-                die($file_obj->get_file_content());
+                $file_obj->readfile();
             }
         } catch (FW\Exception $ex) {
 
         }
-        die();
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_fileview($args) {
         $book_obj = Site\Model\BookUtils::get_book_from_url($args);
         if ($book_obj == null) {
@@ -49,15 +51,12 @@ class Book extends BaseRoute {
 
             FW\Tpl::prepend('title', $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
-            FW\Tpl::display('/book/fileview', $file_obj);
+            FW\Tpl::display('/book/fileview', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
-            FW\Server::redirect('/book/fileview/' . $book_obj->get_book_name() . '/' . $ex->getMessage());
+            $this->redirect('/book/fileview/' . $book_obj->get_book_name() . '/' . $ex->getMessage());
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_filelist($args) {
         $file_obj = Site\Model\BookUtils::get_file_from_url($args);
         if ($file_obj == null) {
@@ -77,12 +76,9 @@ class Book extends BaseRoute {
             $siblings = $file_obj->get_siblings_nodes('', 'Org\\Snje\\Webnote\\Model\\BookUtils::comp_dirfirst');
             FW\Tpl::assign('list', $siblings);
         }
-        FW\Tpl::display('/book/filelist', $file_obj);
+        FW\Tpl::display('/book/filelist', $file_obj, $this->theme);
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_view($args) {
         $book_obj = Site\Model\BookUtils::get_book_from_url($args);
         if ($book_obj == null) {
@@ -95,18 +91,15 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
-            FW\Tpl::display('/book/view', $page_obj);
+            FW\Tpl::display('/book/view', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
-            FW\Server::redirect('/book/view/' . $book_obj->get_book_name() . '/' . $ex->getMessage());
+            $this->redirect('/book/view/' . $book_obj->get_book_name() . '/' . $ex->getMessage());
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_edit($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::editpage');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::editpage');
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
@@ -115,15 +108,12 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[编辑页面]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
-            FW\Tpl::display('/book/edit', $page_obj);
+            FW\Tpl::display('/book/edit', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_list($args) {
         $page_obj = Site\Model\BookUtils::get_page_from_url($args);
         if ($page_obj == null) {
@@ -143,29 +133,20 @@ class Book extends BaseRoute {
             $siblings = $page_obj->get_siblings_nodes('.md', 'Org\\Snje\\Webnote\\Model\\BookUtils::comp_dirfirst');
             FW\Tpl::assign('list', $siblings);
         }
-        FW\Tpl::display('/book/list', $page_obj);
+        FW\Tpl::display('/book/list', $page_obj, $this->theme);
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_push($args) {
-        FW\Common::json_call($args, 'Org\Snje\Webnote\Model\BookUtils::push');
+        $this->json_call($args, 'Org\Snje\Webnote\Model\BookUtils::push');
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_pull($args) {
-        FW\Common::json_call($args, 'Org\Snje\Webnote\Model\BookUtils::pull');
+        $this->json_call($args, 'Org\Snje\Webnote\Model\BookUtils::pull');
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_history($args) {
         $matches = [];
-        if (!preg_match('/^(\d+)\/(.+)?$/', $args, $matches)) {
+        if (!preg_match('/^\/(\d+)\/(.+)?$/', $args, $matches)) {
             $this->show_last_page();
         }
         $hist_page = intval($matches[1]);
@@ -179,18 +160,15 @@ class Book extends BaseRoute {
             $data = $page_obj->get_history($hist_page);
             FW\Tpl::assign('data', $data);
             FW\Tpl::prepend('title', '[历史记录]' . $page_obj->get_url() . '-');
-            FW\Tpl::display('/book/history', $page_obj);
+            FW\Tpl::display('/book/history', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_diff($args) {
         $matches = [];
-        if (!preg_match('/^([0-9a-f]+)\/(.*)?$/', $args, $matches)) {
+        if (!preg_match('/^\/([0-9a-f]+)\/(.*)?$/', $args, $matches)) {
             $this->show_last_page();
         }
         $commit_hash = strval($matches[1]);
@@ -205,19 +183,16 @@ class Book extends BaseRoute {
             $from = isset($_GET['from']) ? intval($_GET['from']) : 1;
             FW\Tpl::assign('from_page', $from);
             FW\Tpl::prepend('title', '[查询修改]' . $page_obj->get_url() . '-');
-            FW\Tpl::display('/book/diff', $page_obj);
+            FW\Tpl::display('/book/diff', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_movepage($args) {
         $this->show_last_page();
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::movepage');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::movepage');
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
@@ -226,25 +201,19 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[移动页面]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
-            FW\Tpl::display('/book/movepage', $page_obj);
+            FW\Tpl::display('/book/movepage', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_movedir($args) {
         $this->show_last_page();
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_addpage($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addpage');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addpage');
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
@@ -258,18 +227,15 @@ class Book extends BaseRoute {
             FW\Tpl::prepend('title', '[新增页面]-' . $parent->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $parent->get_breadcrumb());
             FW\Tpl::assign('parent', $parent);
-            FW\Tpl::display('/book/addpage', $page_obj);
+            FW\Tpl::display('/book/addpage', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_addfile($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addfile');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addfile');
         }
         try {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
@@ -278,18 +244,15 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[新增页面]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
-            FW\Tpl::display('/book/addfile', $file_obj);
+            FW\Tpl::display('/book/addfile', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_adddir($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::adddir');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::adddir');
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
@@ -303,18 +266,15 @@ class Book extends BaseRoute {
             FW\Tpl::prepend('title', '[新增目录]-' . $parent->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $parent->get_breadcrumb());
             FW\Tpl::assign('parent', $parent);
-            FW\Tpl::display('/book/adddir', $page_obj);
+            FW\Tpl::display('/book/adddir', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_addfiledir($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addfiledir');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addfiledir');
         }
         try {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
@@ -323,18 +283,15 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[新增目录]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
-            FW\Tpl::display('/book/addfiledir', $file_obj);
+            FW\Tpl::display('/book/addfiledir', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_delpage($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delpage');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delpage');
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
@@ -343,18 +300,15 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[删除页面]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
-            FW\Tpl::display('/book/delpage', $page_obj);
+            FW\Tpl::display('/book/delpage', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_delfile($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delfile');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delfile');
         }
         try {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
@@ -363,18 +317,15 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[删除文件]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
-            FW\Tpl::display('/book/delfile', $file_obj);
+            FW\Tpl::display('/book/delfile', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_deldir($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::deldir');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::deldir');
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
@@ -383,18 +334,15 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[删除目录]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
-            FW\Tpl::display('/book/deldir', $page_obj);
+            FW\Tpl::display('/book/deldir', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_delfiledir($args) {
         if ($_POST) {
-            FW\Common::json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delfiledir');
+            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delfiledir');
         }
         try {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
@@ -403,7 +351,7 @@ class Book extends BaseRoute {
             }
             FW\Tpl::prepend('title', '[删除目录]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
-            FW\Tpl::display('/book/delfiledir', $file_obj);
+            FW\Tpl::display('/book/delfiledir', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
         }
@@ -414,13 +362,13 @@ class Book extends BaseRoute {
         $path = $system_obj->last_page;
         if ($path != '') {
             $system_obj->set_last_page('');
-            FW\Server::redirect('/book/view/' . $path);
+            $this->redirect('/book/view/' . $path);
         } else {
             $books = $system_obj->get_booklist(false);
             if (count($books) > 0) {
-                FW\Server::redirect('/book/view/' . key($books));
+                $this->redirect('/book/view/' . key($books));
             } else {
-                FW\Server::redirect('/book/open/');
+                $this->redirect('/book/open/');
             }
         }
     }

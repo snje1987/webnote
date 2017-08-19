@@ -172,7 +172,7 @@ class System {
     }
 
     private function __construct() {
-        $dir = FW\Config::get('save', 'data');
+        $dir = FW\Config::get()->get_config('save', 'data');
         if ($dir == '') {
             return;
         }

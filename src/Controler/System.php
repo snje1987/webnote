@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Route;
+namespace Org\Snje\Webnote\Controler;
 
 use Org\Snje\Webnote as Site;
 use Org\Snje\Minifw as FW;
@@ -27,77 +27,62 @@ use Org\Snje\Minifw as FW;
  *
  * @author Yang Ming <yangming0116@163.com>
  */
-class System extends BaseRoute {
+class System extends Base {
 
-    /**
-     * @route(prev=true)
-     */
     private function c_chpwd($args) {
         $system_obj = Site\Model\System::get();
         if (strlen($system_obj->password) == 0) {
-            FW\Server::redirect('/system/setpwd');
+            $this->redirect('/system/setpwd');
         }
         if ($_POST) {
-            FW\Common::json_call($_POST, [$system_obj, 'chpwd']);
+            $this->json_call($_POST, [$system_obj, 'chpwd']);
         }
         FW\Tpl::prepend('title', '修改密码-' . $system_obj->title);
-        FW\Tpl::display('/system/chpwd', []);
+        FW\Tpl::display('/system/chpwd', [], $this->theme);
     }
 
-    /**
-     * @route(prev=false)
-     */
     private function c_setpwd($args) {
         if (isset($_SESSION[Site\Model\System::SESSION_AUTH_KEY]) &&
                 $_SESSION[Site\Model\System::SESSION_AUTH_KEY] == true) {
-            FW\Server::redirect('/book/view/');
+            $this->redirect('/book/view');
         }
         $system_obj = Site\Model\System::get();
         if (strlen($system_obj->password) != 0) {
-            FW\Server::redirect('/system/login');
+            $this->redirect('/system/login');
         }
         if ($_POST) {
-            FW\Common::json_call($_POST, [$system_obj, 'setpwd']);
+            $this->json_call($_POST, [$system_obj, 'setpwd']);
         }
         FW\Tpl::prepend('title', '设置密码-' . $system_obj->title);
-        FW\Tpl::display('/system/setpwd', []);
+        FW\Tpl::display('/system/setpwd', [], $this->theme);
     }
 
-    /**
-     * @route(prev=false)
-     */
     private function c_login($args) {
         if (isset($_SESSION[Site\Model\System::SESSION_AUTH_KEY]) &&
                 $_SESSION[Site\Model\System::SESSION_AUTH_KEY] == true) {
-            FW\Server::redirect('/book/view/');
+            $this->redirect('/book/view/');
         }
         $system_obj = Site\Model\System::get();
         if (strlen($system_obj->password) == 0) {
-            FW\Server::redirect('/system/setpwd');
+            $this->redirect('/system/setpwd');
         }
         if ($_POST) {
             if (isset($_POST['app']) && $_POST['app'] == 1) {
-                FW\Common::json_call($_POST, [$system_obj, 'login'], FW\Common::JSON_CALL_REDIRECT);
+                $this->json_call($_POST, [$system_obj, 'login'], self::JSON_CALL_REDIRECT);
             } else {
-                FW\Common::json_call($_POST, [$system_obj, 'login']);
+                $this->json_call($_POST, [$system_obj, 'login']);
             }
         }
         FW\Tpl::prepend('title', '登陆系统-' . $system_obj->title);
-        FW\Tpl::display('/system/login', []);
+        FW\Tpl::display('/system/login', [], $this->theme);
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_logout($args) {
-        FW\Common::json_call([], [Site\Model\System::get(), 'logout']);
+        $this->json_call([], [Site\Model\System::get(), 'logout']);
     }
 
-    /**
-     * @route(prev=true)
-     */
     private function c_clearcache($args) {
-        FW\Common::json_call([], [Site\Model\System::get(), 'clearcache']);
+        $this->json_call([], [Site\Model\System::get(), 'clearcache']);
     }
 
 }

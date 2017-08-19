@@ -1,6 +1,6 @@
 {
     "require": {
-        "snje1987/minifw": "master@dev",
+        "snje1987/minifw": "2.1.10",
         "snje1987/markdown": "master@dev",
         "snje1987/gitter": "dev-master",
         "twbs/bootstrap": "3.*",
@@ -23,6 +23,6 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "Org\\Snje\\Webnote\\Model\\Resource::copy_composer_resource"
+        "post-autoload-dump": "Org\\Snje\\Webnote\\Resource::copy_composer_resource"
     }
 }

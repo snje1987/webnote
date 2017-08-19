@@ -55,3 +55,8 @@ $cfg['save'] = [
     'data' => '/data',
 ];
 $cfg['upload'] = [];
+
+$cfg['path']['web_root'] = dirname(__DIR__);
+
+
+require dirname(__DIR__) . '/config.php';

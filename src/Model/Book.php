@@ -56,8 +56,9 @@ class Book {
         }
         $this->data = \json_decode($str, true);
         $this->cur_page = '';
-        $this->encoding = FW\Config::get('main', 'encoding', 'utf-8');
-        $this->fsencoding = FW\Config::get('main', 'fsencoding', 'utf-8');
+        $config = FW\Config::get();
+        $this->encoding = $config->get_config('main', 'encoding', 'utf-8');
+        $this->fsencoding = $config->get_config('main', 'fsencoding', 'utf-8');
     }
 
     /**
@@ -172,11 +173,12 @@ class Book {
         $dir = $this->root;
         $dir = FW\File::conv_to($dir, $this->fsencoding);
         $client = new \Gitter\Client();
+        $config = FW\Config::get();
         try {
             $repository = $client->getRepository($dir);
             $repository->setConfig('core.quotepath', 'false');
-            $repository->setConfig('user.name', FW\Config::get('git', 'user'));
-            $repository->setConfig('user.email', FW\Config::get('git', 'email'));
+            $repository->setConfig('user.name', $config->get_config('git', 'user'));
+            $repository->setConfig('user.email', $config->get_config('git', 'email'));
             return $repository;
         } catch (\RuntimeException $ex) {
             return null;

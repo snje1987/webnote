@@ -191,6 +191,17 @@ abstract class BookNode {
         return $data;
     }
 
+    public function readfile() {
+        if (!$this->is_file()) {
+            return null;
+        }
+        $path = $this->get_real_path();
+        if (!FW\File::call('is_file', $path, $this->fsencoding)) {
+            return null;
+        }
+        FW\File::readfile($path, $this->fsencoding);
+    }
+
     public function get_file_content() {
         if (!$this->is_file()) {
             return null;

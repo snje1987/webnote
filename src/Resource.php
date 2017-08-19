@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Model;
+namespace Org\Snje\Webnote;
 
 use Org\Snje\Minifw as FW;
 
@@ -62,3 +62,5 @@ class Resource {
     }
 
 }
+
+$app = FW\System::get(__DIR__ . '/defaults.php');
