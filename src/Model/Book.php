@@ -145,7 +145,7 @@ class Book {
             if ($cmd == 'commit') {
                 $repository->addAll();
                 $repository->commit($args);
-                if (FW\Config::get('git', 'autopush', false)) {
+                if (FW\Config::get()->get_config('git', 'autopush', false)) {
                     $repository->push("origin", "master");
                 }
             } elseif ($cmd == 'push') {

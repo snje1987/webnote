@@ -39,14 +39,16 @@ class Book extends Base {
         $book_obj = Site\Model\BookUtils::get_book_from_url($args);
         if ($book_obj == null) {
             $this->show_last_page();
+            return;
         }
         try {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args, true);
             if ($file_obj == null) {
                 $this->show_last_page();
+                return;
             }
             if ($file_obj->is_dir()) {
-                 FW\Tpl::assign('list', $file_obj->get_sub_nodes('', 'Org\\Snje\\Webnote\\Model\\BookUtils::comp_dirfirst'));
+                FW\Tpl::assign('list', $file_obj->get_sub_nodes('', 'Org\\Snje\\Webnote\\Model\\BookUtils::comp_dirfirst'));
             }
 
             FW\Tpl::prepend('title', $file_obj->get_url() . '-');
@@ -83,11 +85,13 @@ class Book extends Base {
         $book_obj = Site\Model\BookUtils::get_book_from_url($args);
         if ($book_obj == null) {
             $this->show_last_page();
+            return;
         }
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args, true);
             if ($page_obj == null) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
@@ -105,12 +109,14 @@ class Book extends Base {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[编辑页面]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
             FW\Tpl::display('/book/edit', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -148,6 +154,7 @@ class Book extends Base {
         $matches = [];
         if (!preg_match('/^\/(\d+)\/(.+)?$/', $args, $matches)) {
             $this->show_last_page();
+            return;
         }
         $hist_page = intval($matches[1]);
         $url = strval($matches[2]);
@@ -156,6 +163,7 @@ class Book extends Base {
             $page_obj = Site\Model\BookUtils::get_page_from_url($url);
             if ($page_obj == null) {
                 $this->show_last_page();
+                return;
             }
             $data = $page_obj->get_history($hist_page);
             FW\Tpl::assign('data', $data);
@@ -163,6 +171,7 @@ class Book extends Base {
             FW\Tpl::display('/book/history', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -170,13 +179,15 @@ class Book extends Base {
         $matches = [];
         if (!preg_match('/^\/([0-9a-f]+)\/(.*)?$/', $args, $matches)) {
             $this->show_last_page();
+            return;
         }
         $commit_hash = strval($matches[1]);
         $url = strval($matches[2]);
         try {
-             $page_obj = Site\Model\BookUtils::get_page_from_url($url);
+            $page_obj = Site\Model\BookUtils::get_page_from_url($url);
             if ($page_obj == null) {
                 $this->show_last_page();
+                return;
             }
             $commit_obj = $page_obj->get_diff($commit_hash);
             FW\Tpl::assign('commit_obj', $commit_obj);
@@ -186,11 +197,13 @@ class Book extends Base {
             FW\Tpl::display('/book/diff', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
     private function c_movepage($args) {
         $this->show_last_page();
+        return;
         if ($_POST) {
             $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::movepage');
         }
@@ -198,17 +211,20 @@ class Book extends Base {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null || !$page_obj->is_file()) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[移动页面]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
             FW\Tpl::display('/book/movepage', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
     private function c_movedir($args) {
         $this->show_last_page();
+        return;
     }
 
     private function c_addpage($args) {
@@ -219,10 +235,12 @@ class Book extends Base {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
             if ($page_obj == null) {
                 $this->show_last_page();
+                return;
             }
             $parent = $page_obj->get_parent();
             if ($parent == null) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[新增页面]-' . $parent->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $parent->get_breadcrumb());
@@ -230,6 +248,7 @@ class Book extends Base {
             FW\Tpl::display('/book/addpage', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -241,12 +260,14 @@ class Book extends Base {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[新增页面]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
             FW\Tpl::display('/book/addfile', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -258,10 +279,12 @@ class Book extends Base {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
             if ($page_obj == null) {
                 $this->show_last_page();
+                return;
             }
             $parent = $page_obj->get_parent();
             if ($parent == null) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[新增目录]-' . $parent->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $parent->get_breadcrumb());
@@ -269,6 +292,7 @@ class Book extends Base {
             FW\Tpl::display('/book/adddir', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -280,12 +304,14 @@ class Book extends Base {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[新增目录]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
             FW\Tpl::display('/book/addfiledir', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -297,12 +323,14 @@ class Book extends Base {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null || !$page_obj->is_file()) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[删除页面]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
             FW\Tpl::display('/book/delpage', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -314,12 +342,14 @@ class Book extends Base {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null || !$file_obj->is_file()) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[删除文件]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
             FW\Tpl::display('/book/delfile', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -331,12 +361,14 @@ class Book extends Base {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null || !$page_obj->is_dir()) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[删除目录]-' . $page_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $page_obj->get_breadcrumb());
             FW\Tpl::display('/book/deldir', $page_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -348,12 +380,14 @@ class Book extends Base {
             $file_obj = Site\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null || !$file_obj->is_dir()) {
                 $this->show_last_page();
+                return;
             }
             FW\Tpl::prepend('title', '[删除目录]-' . $file_obj->get_url() . '-');
             FW\Tpl::assign('breadcrumb', $file_obj->get_breadcrumb());
             FW\Tpl::display('/book/delfiledir', $file_obj, $this->theme);
         } catch (FW\Exception $ex) {
             $this->show_last_page();
+            return;
         }
     }
 
@@ -363,6 +397,7 @@ class Book extends Base {
         if ($path != '') {
             $system_obj->set_last_page('');
             $this->redirect('/book/view/' . $path);
+            return;
         } else {
             $books = $system_obj->get_booklist(false);
             if (count($books) > 0) {
