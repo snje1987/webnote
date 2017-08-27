@@ -188,6 +188,7 @@ class System {
         }
         $this->data_path = WEB_ROOT . $dir . '/info.json';
         if (!file_exists($this->data_path)) {
+            $this->save();
             return;
         }
         $str = file_get_contents($this->data_path);

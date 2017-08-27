@@ -44,6 +44,8 @@ class Resource {
         $src_root = WEB_ROOT . '/vendor/';
         $dest_root = WEB_ROOT . '/';
 
+        FW\File::clear_dir($dest_root . 'www/lib', true);
+
         foreach (self::COMPOSER_DIRS as $k => $v) {
             $from = $src_root . $k;
             $to = $dest_root . $v;
