@@ -29,7 +29,9 @@ use Org\Snje\Minifw as FW;
 class Resource {
 
     const COMPOSER_FILES = [
+        'components/jquery/jquery.js' => 'www/lib/jquery.js',
         'components/jquery/jquery.min.js' => 'www/lib/jquery.min.js',
+        'components/jquery/jquery.min.map' => 'www/lib/jquery.min.map',
         'jquery-form/form/dist/jquery.form.min.js' => 'www/lib/jquery.form.min.js',
         'components/highlightjs/highlight.pack.min.js' => 'www/lib/highlight.pack.min.js',
         'components/highlightjs/styles/github.css' => 'www/lib/github.css'
@@ -61,6 +63,8 @@ class Resource {
                 FW\File::copy($from, $to);
             }
         }
+        $recource_obj = new FW\Resource();
+        $recource_obj->compile_all();
     }
 
 }

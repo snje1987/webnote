@@ -6,6 +6,7 @@ $cfg['debug']['debug'] = 0;
 $cfg['main']['domain'] = '.webnote.snje.org';
 //文件系统的编码
 $cfg['main']['fsencoding'] = 'utf-8';
+$cfg['main']['cache'] = 3600;
 
 $cfg['main']['auth'] = false;
 
@@ -49,6 +50,7 @@ $cfg['code'] = [
 $cfg['main']['encoding'] = 'utf-8';
 $cfg['main']['db'] = '';
 $cfg['main']['theme'] = 'def';
+$cfg['main']['resource_map'] = '/config/resource_map.php';
 $cfg['mysql'] = [];
 $cfg['sqlite'] = [];
 $cfg['save'] = [
