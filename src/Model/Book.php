@@ -16,9 +16,10 @@ use Org\Snje\Webnote as Site;
 class Book {
 
     protected $root = '';
-    protected $data = [];
     protected $encoding = '';
     protected $fsencoding = '';
+    protected $bookname = null;
+    protected $autopush = false;
 
     const Type_All = 0;
     const Type_Enable = 1;
@@ -49,16 +50,21 @@ class Book {
     public function __construct($path) {
         $path = str_replace('\\', '/', $path);
         $this->root = rtrim(strval($path), '/') . '/';
+        $this->load_info();
+        $config = FW\Config::get();
+        $this->encoding = $config->get_config('main', 'encoding', 'utf-8');
+        $this->fsencoding = $config->get_config('main', 'fsencoding', 'utf-8');
+    }
+
+    public function load_info() {
         $info_file = $this->root . 'book.json';
         $str = FW\File::get_content($info_file, $this->fsencoding);
         if ($str == '') {
             throw new FW\Exception('读取信息失败');
         }
-        $this->data = \json_decode($str, true);
-        $this->cur_page = '';
-        $config = FW\Config::get();
-        $this->encoding = $config->get_config('main', 'encoding', 'utf-8');
-        $this->fsencoding = $config->get_config('main', 'fsencoding', 'utf-8');
+        $data = \json_decode($str, true);
+        $this->bookname = $data['name'];
+        $this->autopush = isset($data['autopush']) ? $data['autopush'] : false;
     }
 
     /**
@@ -100,7 +106,6 @@ class Book {
         }
     }
 
-
     /**
      * 返回一个文件，如果不存在则返回null
      *
@@ -132,8 +137,8 @@ class Book {
 
     public function open($post) {
         $system_obj = System::get();
-        $system_obj->add_book($this->data['name'], $this->root);
-        return ['returl' => '/book/view/' . $this->data['name']];
+        $system_obj->add_book($this->bookname, $this->root);
+        return ['returl' => '/book/view/' . $this->bookname];
     }
 
     public function git_cmd($cmd, $args = '') {
@@ -145,7 +150,7 @@ class Book {
             if ($cmd == 'commit') {
                 $repository->addAll();
                 $repository->commit($args);
-                if (FW\Config::get()->get_config('git', 'autopush', false)) {
+                if ($this->autopush && FW\Config::get()->get_config('git', 'autopush', false)) {
                     $repository->push("origin", "master");
                 }
             } elseif ($cmd == 'push') {
@@ -162,7 +167,7 @@ class Book {
     }
 
     public function get_book_name() {
-        return $this->data['name'];
+        return $this->bookname;
     }
 
     /**
