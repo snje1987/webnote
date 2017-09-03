@@ -9,7 +9,8 @@
         "components/highlightjs": "9.*",
         "bootstrap-select/bootstrap-select": "1.*",
         "gkralik/php-uglifyjs": "dev-master",
-        "natxet/cssmin": "dev-master"
+        "natxet/cssmin": "dev-master",
+        "fortawesome/font-awesome": "^4.7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "5.3.*"

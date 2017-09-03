@@ -9,7 +9,7 @@ require_once '../vendor/autoload.php';
 
 $app = FW\System::get(dirname(__DIR__) . '/src/defaults.php');
 
-$app->reg_call('/^\/www\/([^?]+)$/', function($path) {
+$app->reg_call('/^\/www\/([^?#]+).*$/', function($path) {
     $path = str_replace('..', '', $path);
     try {
         $router = new FW\Router();

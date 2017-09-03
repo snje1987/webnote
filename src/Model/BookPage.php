@@ -153,7 +153,7 @@ class BookPage extends BookNode {
             $str = FW\File::get_content($dest, $this->fsencoding);
         }
         $system_obj = System::get();
-        $system_obj->set_last_page($this->get_url());
+        $system_obj->set_last_page($this->get_path(), $this->get_book_name());
         return $str;
     }
 

@@ -34,6 +34,9 @@ class System {
      */
     protected static $_instance = null;
 
+    /**
+     * @return System
+     */
     public static function get() {
         if (self::$_instance === null) {
             self::$_instance = new static();
@@ -112,8 +115,14 @@ class System {
         return true;
     }
 
-    public function set_last_page($page) {
-        $this->last_page = $page;
+    public function set_last_page($page, $book = null) {
+        if ($book === null || !isset($this->books[$book])) {
+            $this->last_page = $page;
+        }
+        else {
+            $this->books[$book]['last_page'] = $page;
+            $this->last_page = $book . '/' . $page;
+        }
         $this->save();
     }
 
@@ -217,6 +226,7 @@ class System {
                 $this->books[$k] = [
                     'path' => $v['path'],
                     'disable' => isset($v['disable']) ? $v['disable'] : false,
+                    'last_page' => isset($v['last_page']) ? $v['last_page'] : '',
                 ];
             }
         }

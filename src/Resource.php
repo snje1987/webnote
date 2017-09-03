@@ -39,6 +39,8 @@ class Resource {
     const COMPOSER_DIRS = [
         'twbs/bootstrap/dist/' => 'www/lib/bootstrap/',
         'bootstrap-select/bootstrap-select/dist/' => 'www/lib/bootstrap-select/',
+        'fortawesome/font-awesome/css' => 'www/lib/font-awesome/css',
+        'fortawesome/font-awesome/fonts' => 'www/lib/font-awesome/fonts',
     ];
 
     public static function copy_composer_resource() {

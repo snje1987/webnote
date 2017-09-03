@@ -1,73 +1,94 @@
 <{use Org\Snje\Minifw as FW}>
 <{use Org\Snje\Webnote as WN}>
 <{$cur_path=$args->get_url()}>
-<{if $args->is_root()}>
+<{if !$args->is_root()}>
 <div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
-    <a class="btn btn-success" href="/book/history/1/<{=$args->get_book_name()}>">
-        <span class="glyphicon glyphicon-list-alt"></span>
-    </a>
-    <a class="btn btn-success" href="/book/fileview/<{=$args->get_book_name()}>">
-        <span class="glyphicon glyphicon-picture"></span>
-    </a>
-    <a class="btn btn-success ajax" href="/book/push/<{=$args->get_book_name()}>">
-        <span class="glyphicon glyphicon-cloud-upload"></span>
-    </a>
-    <a class="btn btn-success ajax" href="/book/pull/<{=$args->get_book_name()}>">
-        <span class="glyphicon glyphicon-cloud-download"></span>
-    </a>
-</div>
-<{else}>
-<div class="btn-toolbar" role="toolbar" style="margin-bottom:10px;">
-    <{if $args->is_dir()}>
-    <a class="btn btn-success" href="/book/deldir/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon glyphicon-minus"></span>
-    </a>
-    <{elseif $args->is_file()}>
-    <a class="btn btn-success" href="/book/history/1/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon-list-alt"></span>
-    </a>
-    <a class="btn btn-success" href="/book/edit/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon glyphicon-edit"></span>
-    </a>
-    <a class="btn btn-success" href="/book/delpage/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon glyphicon-minus"></span>
-    </a>
-    <{/if}>
     <a class="btn btn-success" href="/book/addpage/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-file"></span><
-        /a>
+        <span class="fa fa-plus"></span>&nbsp;<span class="fa fa-file"></span></a>
     <a class="btn btn-success" href="/book/adddir/<{=$args->get_url()}>">
-        <span class="glyphicon glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon glyphicon-folder-open"></span>
+        <span class="fa fa-plus"></span>&nbsp;<span class="fa fa-folder-open"></span>
     </a>
 </div>
 <{/if}>
-<div class="list-group">
+<ul class="list-group">
 <{if $is_book}>
     <{foreach $books $k $v}>
-        <{if $k == $cur_path}>
-        <a class="list-group-item list-group-item-danger" href="/book/view/<{=$k}>"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<{=$k}></a>
-        <{else}>
-        <a class="list-group-item list-group-item-info" href="/book/view/<{=$k}>"><span class="glyphicon glyphicon-book"></span>&nbsp;&nbsp;<{=$k}></a>
-        <{/if}>
+    <{if $k == $cur_path}>
+    <li class="list-group-item list-group-item-danger">
+        <span class="fa fa-book"></span>&nbsp;&nbsp;
+        <a href="/book/view/<{=$k}>"><{=$k}></a>&nbsp;&nbsp;
+        <a href="/book/view/<{=$k}>/<{=$v['last_page']}>">[<{=$v['last_page']}>]</a>&nbsp;&nbsp;
+        <div class="btn-toolbar" style="float:right;">
+            <a class="btn btn-xs btn-success" href="/book/history/1/<{=$k}>"><span class="fa fa-history"></span></a>
+            <a class="btn btn-xs btn-success" href="/book/fileview/<{=$k}>"><span class="fa fa-file"></span></a>
+            <a class="btn btn-xs btn-success ajax" href="/book/push/<{=$k}>"><span class="fa fa-upload"></span></a>
+            <a class="btn btn-xs btn-success ajax" href="/book/pull/<{=$k}>"><span class="fa fa-download"></span></a>
+        </div>
+    </li>
+    <{else}>
+    <li class="list-group-item list-group-item-info">
+        <span class="fa fa-book"></span>&nbsp;&nbsp;
+        <a href="/book/view/<{=$k}>"><{=$k}></a>&nbsp;&nbsp;
+        <a href="/book/view/<{=$k}>/<{=$v['last_page']}>">[<{=$v['last_page']}>]</a>
+        <div class="btn-toolbar" style="float:right;">
+            <a class="btn btn-xs btn-success" href="/book/history/1/<{=$k}>"><span class="fa fa-history"></span></a>
+            <a class="btn btn-xs btn-success" href="/book/fileview/<{=$k}>"><span class="fa fa-file"></span></a>
+            <a class="btn btn-xs btn-success ajax" href="/book/push/<{=$k}>"><span class="fa fa-upload"></span></a>
+            <a class="btn btn-xs btn-success ajax" href="/book/pull/<{=$k}>"><span class="fa fa-download"></span></a>
+        </div>
+    </li>
+    <{/if}>
     <{/foreach}>
 <{else}>
     <{foreach $list $v}>
     <{if $v->is_dir()}>
         <{if $v->get_url() == $cur_path}>
-        <a class="list-group-item list-group-item-danger" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <li class="list-group-item list-group-item-danger">
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-folder-open"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+            <div class="btn-toolbar" style="float:right;">
+                <a class="btn btn-xs btn-danger" href="/book/deldir/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
+            </div>
+        </li>
         <{else}>
-        <a class="list-group-item list-group-item-info" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <li class="list-group-item list-group-item-info">
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-folder"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+            <div class="btn-toolbar" style="float:right;">
+                <a class="btn btn-xs btn-danger" href="/book/deldir/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
+            </div>
+        </li>
         <{/if}>
     <{else}>
         <{if $v->get_url() == $cur_path}>
-        <a class="list-group-item list-group-item-danger" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <li class="list-group-item list-group-item-danger">
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+            <div class="btn-toolbar" style="float:right;">
+                <a class="btn btn-xs btn-success" href="/book/history/1/<{=$v->get_url()}>">
+                    <span class="fa fa-history"></span>
+                </a>
+                <a class="btn btn-xs btn-success" href="/book/edit/<{=$v->get_url()}>">
+                    <span class="fa fa-edit"></span>
+                </a>
+                <a class="btn btn-xs btn-danger" href="/book/delpage/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
+            </div>
+        </li>
         <{else}>
-        <a class="list-group-item list-group-item-text" href="/book/view/<{=$v->get_url()}>"><span class="glyphicon glyphicon-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+        <li class="list-group-item list-group-item-text">
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
+            <div class="btn-toolbar" style="float:right;">
+                <a class="btn btn-xs btn-success" href="/book/history/1/<{=$v->get_url()}>">
+                    <span class="fa fa-history"></span>
+                </a>
+                <a class="btn btn-xs btn-success" href="/book/edit/<{=$v->get_url()}>">
+                    <span class="fa fa-edit"></span>
+                </a>
+                <a class="btn btn-xs btn-danger" href="/book/delpage/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
+            </div>
+        </li>
         <{/if}>
     <{/if}>
     <{/foreach}>
 <{/if}>
-</div>
+</ul>
 <script type="text/javascript">
 (function($){
     $(document).ready(function(){

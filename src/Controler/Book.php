@@ -90,7 +90,7 @@ class Book extends Base {
         try {
             $page_obj = Site\Model\BookUtils::get_page_from_url($args, true);
             if ($page_obj == null) {
-                $this->show_last_page();
+                $this->show_last_page($book_obj->get_book_name());
                 return;
             }
             FW\Tpl::prepend('title', $page_obj->get_url() . '-');
@@ -391,19 +391,26 @@ class Book extends Base {
         }
     }
 
-    private function show_last_page() {
+    private function show_last_page($bookname = '') {
         $system_obj = Site\Model\System::get();
-        $path = $system_obj->last_page;
-        if ($path != '') {
-            $system_obj->set_last_page('');
-            $this->redirect('/book/view/' . $path);
+        $books = $system_obj->get_booklist(false);
+        if ($bookname !== '' && isset($books[$bookname])) {
+            $path = $books[$bookname]['last_page'];
+            $system_obj->set_last_page('', $bookname);
+            $this->redirect('/book/view/' . $bookname . '/' . $path);
             return;
         } else {
-            $books = $system_obj->get_booklist(false);
-            if (count($books) > 0) {
-                $this->redirect('/book/view/' . key($books));
+            $path = $system_obj->last_page;
+            if ($path != '') {
+                $system_obj->set_last_page('');
+                $this->redirect('/book/view/' . $path);
+                return;
             } else {
-                $this->redirect('/book/open/');
+                if (count($books) > 0) {
+                    $this->redirect('/book/view/' . key($books));
+                } else {
+                    $this->redirect('/book/open/');
+                }
             }
         }
     }
