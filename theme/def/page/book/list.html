@@ -15,27 +15,27 @@
     <{foreach $books $k $v}>
     <{if $k == $cur_path}>
     <li class="list-group-item list-group-item-danger">
-        <span class="fa fa-book"></span>&nbsp;&nbsp;
-        <a href="/book/view/<{=$k}>"><{=$k}></a>&nbsp;&nbsp;
-        <a href="/book/view/<{=$k}>/<{=$v['last_page']}>">[<{=$v['last_page']}>]</a>&nbsp;&nbsp;
         <div class="btn-toolbar" style="float:right;">
             <a class="btn btn-xs btn-success" href="/book/history/1/<{=$k}>"><span class="fa fa-history"></span></a>
             <a class="btn btn-xs btn-success" href="/book/fileview/<{=$k}>"><span class="fa fa-file"></span></a>
             <a class="btn btn-xs btn-success ajax" href="/book/push/<{=$k}>"><span class="fa fa-upload"></span></a>
             <a class="btn btn-xs btn-success ajax" href="/book/pull/<{=$k}>"><span class="fa fa-download"></span></a>
         </div>
-    </li>
-    <{else}>
-    <li class="list-group-item list-group-item-info">
         <span class="fa fa-book"></span>&nbsp;&nbsp;
         <a href="/book/view/<{=$k}>"><{=$k}></a>&nbsp;&nbsp;
         <a href="/book/view/<{=$k}>/<{=$v['last_page']}>">[<{=$v['last_page']}>]</a>
+    </li>
+    <{else}>
+    <li class="list-group-item list-group-item-info">
         <div class="btn-toolbar" style="float:right;">
             <a class="btn btn-xs btn-success" href="/book/history/1/<{=$k}>"><span class="fa fa-history"></span></a>
             <a class="btn btn-xs btn-success" href="/book/fileview/<{=$k}>"><span class="fa fa-file"></span></a>
             <a class="btn btn-xs btn-success ajax" href="/book/push/<{=$k}>"><span class="fa fa-upload"></span></a>
             <a class="btn btn-xs btn-success ajax" href="/book/pull/<{=$k}>"><span class="fa fa-download"></span></a>
         </div>
+        <span class="fa fa-book"></span>&nbsp;&nbsp;
+        <a href="/book/view/<{=$k}>"><{=$k}></a>&nbsp;&nbsp;
+        <a href="/book/view/<{=$k}>/<{=$v['last_page']}>">[<{=$v['last_page']}>]</a>
     </li>
     <{/if}>
     <{/foreach}>
@@ -44,23 +44,22 @@
     <{if $v->is_dir()}>
         <{if $v->get_url() == $cur_path}>
         <li class="list-group-item list-group-item-danger">
-            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-folder-open"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
             <div class="btn-toolbar" style="float:right;">
                 <a class="btn btn-xs btn-danger" href="/book/deldir/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
             </div>
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-folder-open"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         </li>
         <{else}>
         <li class="list-group-item list-group-item-info">
-            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-folder"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
             <div class="btn-toolbar" style="float:right;">
                 <a class="btn btn-xs btn-danger" href="/book/deldir/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
             </div>
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-folder"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         </li>
         <{/if}>
     <{else}>
         <{if $v->get_url() == $cur_path}>
         <li class="list-group-item list-group-item-danger">
-            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
             <div class="btn-toolbar" style="float:right;">
                 <a class="btn btn-xs btn-success" href="/book/history/1/<{=$v->get_url()}>">
                     <span class="fa fa-history"></span>
@@ -70,10 +69,10 @@
                 </a>
                 <a class="btn btn-xs btn-danger" href="/book/delpage/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
             </div>
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         </li>
         <{else}>
         <li class="list-group-item list-group-item-text">
-            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
             <div class="btn-toolbar" style="float:right;">
                 <a class="btn btn-xs btn-success" href="/book/history/1/<{=$v->get_url()}>">
                     <span class="fa fa-history"></span>
@@ -83,6 +82,7 @@
                 </a>
                 <a class="btn btn-xs btn-danger" href="/book/delpage/<{=$v->get_url()}>"><span class="fa fa-minus"></span></a>
             </div>
+            <a href="/book/view/<{=$v->get_url()}>"><span class="fa fa-file"></span>&nbsp;&nbsp;<{=$v->get_node_name()}></a>
         </li>
         <{/if}>
     <{/if}>

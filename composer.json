@@ -1,6 +1,6 @@
 {
     "require": {
-        "snje1987/minifw": "2.1.15",
+        "snje1987/minifw": "2.1.20",
         "snje1987/markdown": "master@dev",
         "snje1987/gitter": "dev-master",
         "twbs/bootstrap": "3.*",
