@@ -263,11 +263,14 @@ abstract class BookNode {
         return true;
     }
 
-    public function delete($msg = '') {
+    public function delete($msg = null) {
         if ($this->is_file()) {
             $path = $this->get_real_path();
             FW\File::delete($path, true);
-            return $this->book_obj->git_cmd('commit', $msg);
+            if ($msg !== null) {
+                return $this->book_obj->git_cmd('commit', $msg);
+            }
+            return true;
         } elseif ($this->is_dir()) {
             $list = $this->get_sub_nodes();
             if (!empty($list)) {

@@ -73,7 +73,10 @@ class BookFile extends BookNode {
         $path = $this->get_real_path();
         FW\File::mkdir(dirname($path));
         if (\move_uploaded_file($file['tmp_name'], $path)) {
-            return $this->book_obj->git_cmd('commit', $msg);
+            if ($msg !== null) {
+                return $this->book_obj->git_cmd('commit', $msg);
+            }
+            return true;
         } else {
             return false;
         }

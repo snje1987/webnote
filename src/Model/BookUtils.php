@@ -33,8 +33,9 @@ class BookUtils {
         if (!isset($post['dir'])) {
             throw new FW\Exception('非法操作');
         }
-        if (!isset($post['msg']) || $post['msg'] == '') {
-            throw new FW\Exception('修改说明不能为空');
+        $msg = null;
+        if (isset($post['msg']) && $post['msg'] != '') {
+            $msg = strval($post['msg']);
         }
         if (!isset($post['name']) || $post['name'] == '') {
             throw new FW\Exception('页面名称不能为空');
@@ -48,7 +49,7 @@ class BookUtils {
             $new_page = new BookPage(
                     $page_obj->get_book()
                     , $page_obj->get_path() . '/' . strval($post['name']));
-            return $new_page->addpage($post['content'], $post['msg']);
+            return $new_page->addpage($post['content'], $msg);
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -60,8 +61,9 @@ class BookUtils {
         if (!isset($post['dir'])) {
             throw new FW\Exception('非法操作');
         }
-        if (!isset($post['msg']) || $post['msg'] == '') {
-            throw new FW\Exception('修改说明不能为空');
+        $msg = null;
+        if (isset($post['msg']) && $post['msg'] != '') {
+            $msg = strval($post['msg']);
         }
         $file_obj = self::get_file_from_url($post['dir']);
         if ($file_obj == null || !$file_obj->is_dir()) {
@@ -75,7 +77,7 @@ class BookUtils {
             $new_file = new BookFile(
                     $file_obj->get_book()
                     , $file_obj->get_path() . '/' . $name);
-            return $new_file->upload($_FILES['file'], $post['msg']);
+            return $new_file->upload($_FILES['file'], $msg);
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -135,8 +137,9 @@ class BookUtils {
         if (!isset($post['page'])) {
             throw new FW\Exception('非法操作');
         }
-        if (!isset($post['msg']) || $post['msg'] == '') {
-            throw new FW\Exception('修改说明不能为空');
+        $msg = null;
+        if (isset($post['msg']) && $post['msg'] != '') {
+            $msg = strval($post['msg']);
         }
         $page_obj = self::get_page_from_url($post['page']);
         if ($page_obj == null || !$page_obj->is_file()) {
@@ -144,7 +147,7 @@ class BookUtils {
         }
 
         try {
-            return $page_obj->edit(strval($post['content']), strval($post['msg']));
+            return $page_obj->edit(strval($post['content']), $msg);
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -156,15 +159,16 @@ class BookUtils {
         if (!isset($post['page'])) {
             throw new FW\Exception('非法操作');
         }
-        if (!isset($post['msg']) || $post['msg'] == '') {
-            throw new FW\Exception('修改说明不能为空');
+        $msg = null;
+        if (isset($post['msg']) && $post['msg'] != '') {
+            $msg = strval($post['msg']);
         }
         $page_obj = self::get_page_from_url($post['page']);
         if ($page_obj == null || !$page_obj->is_file()) {
             throw new FW\Exception('非法操作');
         }
         try {
-            return $page_obj->delete($post['msg']);
+            return $page_obj->delete($msg);
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {
@@ -176,15 +180,16 @@ class BookUtils {
         if (!isset($post['file'])) {
             throw new FW\Exception('非法操作');
         }
-        if (!isset($post['msg']) || $post['msg'] == '') {
-            throw new FW\Exception('修改说明不能为空');
+        $msg = null;
+        if (isset($post['msg']) && $post['msg'] != '') {
+            $msg = strval($post['msg']);
         }
         $file_obj = self::get_file_from_url($post['file']);
         if ($file_obj == null || !$file_obj->is_file()) {
             throw new FW\Exception('非法操作');
         }
         try {
-            return $file_obj->delete($post['msg']);
+            return $file_obj->delete($msg);
         } catch (FW\Exception $ex) {
             throw $ex;
         } catch (\RuntimeException $ex) {

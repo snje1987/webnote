@@ -227,7 +227,10 @@ class BookPage extends BookNode {
         if (!FW\File::put_content($path, $content, $this->fsencoding)) {
             return false;
         }
-        return $this->book_obj->git_cmd('commit', $msg);
+        if ($msg !== null) {
+            return $this->book_obj->git_cmd('commit', $msg);
+        }
+        return true;
     }
 
     public function addpage($content, $msg) {
@@ -247,7 +250,10 @@ class BookPage extends BookNode {
         if (!FW\File::put_content($path, $content, $this->fsencoding)) {
             return false;
         }
-        return $this->book_obj->git_cmd('commit', $msg);
+        if ($msg !== null) {
+            return $this->book_obj->git_cmd('commit', $msg);
+        }
+        return true;
     }
 
 }
