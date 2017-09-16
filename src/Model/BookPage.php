@@ -252,4 +252,4 @@ class BookPage extends BookNode {
 
 }
 
-BookPage::$always_compile = FW\Config::get('book', 'always_compile', 0);
+BookPage::$always_compile = FW\Config::get()->get_config('book', 'always_compile', 0);

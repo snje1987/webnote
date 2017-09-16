@@ -347,7 +347,7 @@ class BookUtils {
     }
 
     public static function parse_codebock($class, $code) {
-        $cfg = FW\Config::get('code', $class, []);
+        $cfg = FW\Config::get()->get_config('code', $class, []);
         $ret = '';
         if (is_array($cfg) && isset($cfg['cmd']) &&
                 isset($cfg['path']) && $cfg['path'] != '') {
