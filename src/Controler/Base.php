@@ -34,7 +34,9 @@ abstract class Base extends FW\Controler {
     public function dispatch($function, $args) {
         $noprev = ['login', 'setpwd'];
         if (static::class !== System::class || !in_array($function, $noprev)) {
-            $this->prev();
+            if (!$this->prev()) {
+                return;
+            }
         }
         parent::dispatch($function, $args);
     }
@@ -56,6 +58,7 @@ abstract class Base extends FW\Controler {
             $this->redirect('/system/setpwd');
         }
         $this->redirect('/system/login');
+        return false;
     }
 
 }
