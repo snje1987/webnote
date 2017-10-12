@@ -21,7 +21,16 @@ $app->reg_call('/^\/www\/([^?#]+).*$/', function($path) {
 });
 
 $app->reg_call('/^([^?#]*)(.*)?$/', function($path, $nouse = '') {
-    $path = urldecode($path);
+    $cfg = FW\Config::get();
+    $decode = $cfg->get_config('main', 'uri_decode', false);
+    if ($decode) {
+        $path = urldecode($path);
+    }
+    $encoding = $cfg->get_config('main', 'encoding', '');
+    $uri_encoding = $cfg->get_config('main', 'uri_encoding', '');
+    if ($uri_encoding != '' && $encoding != $uri_encoding) {
+        $path = mb_convert_encoding($path, $encoding, $uri_encoding);
+    }
     try {
         $router = new FW\Router();
         $router->single_layer_route($path, 'Org\Snje\Webnote\Controler', '');

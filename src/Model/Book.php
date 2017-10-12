@@ -148,6 +148,12 @@ class Book {
         }
         try {
             if ($cmd == 'commit') {
+                $cfg = FW\Config::get();
+                $encoding = $cfg->get_config('main', 'encoding', '');
+                $bash_encoding = $cfg->get_config('main', 'bash_encoding', '');
+                if ($bash_encoding != '' && $encoding != $bash_encoding) {
+                    $args = mb_convert_encoding($args, $bash_encoding, $encoding);
+                }
                 $repository->addAll();
                 $repository->commit($args);
                 if ($this->autopush && FW\Config::get()->get_config('git', 'autopush', false)) {
@@ -159,7 +165,7 @@ class Book {
             else {
                 $repository->pull("origin", "master");
             }
-        } catch (\RuntimeException $ex) {
+        } catch (\Exception $ex) {
             $repository->reset();
             throw new FW\Exception($ex->getMessage());
         }
@@ -175,17 +181,17 @@ class Book {
      * @return \Gitter\Repository 版本库
      */
     public function get_Repository() {
+        $config = FW\Config::get();
         $dir = $this->root;
         $dir = FW\File::conv_to($dir, $this->fsencoding);
-        $client = new \Gitter\Client();
-        $config = FW\Config::get();
+        $client = new \Gitter\Client($config->get_config('git', 'path', null));
         try {
             $repository = $client->getRepository($dir);
             $repository->setConfig('core.quotepath', 'false');
             $repository->setConfig('user.name', $config->get_config('git', 'user'));
             $repository->setConfig('user.email', $config->get_config('git', 'email'));
             return $repository;
-        } catch (\RuntimeException $ex) {
+        } catch (\Exception $ex) {
             return null;
         }
     }

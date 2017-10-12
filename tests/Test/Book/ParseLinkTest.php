@@ -36,7 +36,8 @@ class ParseLinkTest extends \PHPUnit_Framework_TestCase {
 
     public function test_parse_link() {
         $book = new Webnote\Model\Book(WEB_ROOT . '/tests/data/test1');
-        $book->step_into("测试文件");
+        $url = new Webnote\Model\BookUrl('测试/测试文件');
+        $page = $book->get_page($url);
         $hash = [
             '[[F:1.jpg]]' => '/book/file/测试/1.jpg',
             '[[F:目录//1.jpg]]' => '/book/file/测试/目录/1.jpg',
@@ -46,11 +47,12 @@ class ParseLinkTest extends \PHPUnit_Framework_TestCase {
             '[[V:笔记//目录//1.jpg]]' => '/book/view/笔记/目录/1.jpg',
         ];
         foreach ($hash as $k => $v) {
-            $ret = $book->parse_link($k);
+            $ret = $page->parse_link($k);
             $this->assertEquals($v, $ret);
         }
 
-        $book->step_into("测试目录/目录文件");
+        $url = new Webnote\Model\BookUrl('测试/测试目录/目录文件');
+        $page = $book->get_page($url);
         $hash = [
             '[[F:1.jpg]]' => '/book/file/测试/测试目录/1.jpg',
             '[[F:目录//1.jpg]]' => '/book/file/测试/目录/1.jpg',
@@ -60,7 +62,7 @@ class ParseLinkTest extends \PHPUnit_Framework_TestCase {
             '[[V:笔记//目录//1.jpg]]' => '/book/view/笔记/目录/1.jpg',
         ];
         foreach ($hash as $k => $v) {
-            $ret = $book->parse_link($k);
+            $ret = $page->parse_link($k);
             $this->assertEquals($v, $ret);
         }
     }

@@ -317,7 +317,7 @@ class BookUtils {
 
     public static function dirname($page) {
         $page = \dirname($page);
-        if ($page == '.') {
+        if ($page == '.' || $page == '\\') {
             $page = '';
         }
         return $page;

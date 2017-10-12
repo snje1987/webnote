@@ -21,6 +21,7 @@ namespace Org\Snje\Webnote\Model;
 
 use Org\Snje\Minifw as FW;
 use Org\Snje\Webnote as Site;
+use Org\Snje\Minifw\Exception;
 
 /**
  * Description of BookPage
@@ -71,7 +72,8 @@ class BookFile extends BookNode {
             return false;
         }
         $path = $this->get_real_path();
-        FW\File::mkdir(dirname($path));
+        FW\File::mkdir(dirname($path), $this->fsencoding);
+        $path = FW\File::conv_to($path, $this->fsencoding);
         if (\move_uploaded_file($file['tmp_name'], $path)) {
             if ($msg !== null) {
                 return $this->book_obj->git_cmd('commit', $msg);
