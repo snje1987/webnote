@@ -1,13 +1,13 @@
 {
     "require": {
-        "snje1987/minifw": "dev-master",
+        "snje1987/minifw2": "^1.0",
         "snje1987/markdown": "master@dev",
         "snje1987/gitter": "dev-master",
         "twbs/bootstrap": "3.*",
         "components/jquery": "3.*",
         "jquery-form/form": "4.*",
         "components/highlightjs": "9.*",
-        "bootstrap-select/bootstrap-select": "1.*",
+        "snapappointments/bootstrap-select": "1.*",
         "gkralik/php-uglifyjs": "dev-master",
         "natxet/cssmin": "dev-master",
         "fortawesome/font-awesome": "^4.7.0"
@@ -15,17 +15,22 @@
     "require-dev": {
         "phpunit/phpunit": "5.3.*"
     },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        }
+    },
     "autoload": {
         "psr-4": {
-            "Org\\Snje\\Webnote\\": "src/"
+            "App\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Org\\Snje\\WebnoteTest\\": "tests/"
+            "AppTest\\": "tests/"
         }
     },
     "scripts": {
-        "post-autoload-dump": "Org\\Snje\\Webnote\\Resource::copy_composer_resource"
+        "post-autoload-dump": "php ./bin/cmd.php system copy_resource"
     }
 }

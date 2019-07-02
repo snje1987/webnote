@@ -1,10 +1,13 @@
-<Files ~ "^.(htaccess|htpasswd)$">
-deny from all
+<Files ~ "^\.(htaccess|htpasswd)$">
+    Require all denied
 </Files>
-order deny,allow
+<Files ~ "^www/.*\.php">
+    Require all denied
+</Files>
 
 Options +FollowSymLinks
 RewriteEngine on
 
 RewriteCond %{REQUEST_URI} !^/www/.*$
-RewriteRule .* /www/index.php
+RewriteCond %{REQUEST_URI} !^/index.php$
+RewriteRule .* /index.php [QSA,PT,L]

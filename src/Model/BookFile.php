@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Model;
+namespace App\Model;
 
 use Org\Snje\Minifw as FW;
-use Org\Snje\Webnote as Site;
 use Org\Snje\Minifw\Exception;
+use App;
 
 /**
  * Description of BookPage

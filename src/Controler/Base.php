@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Controler;
+namespace App\Controler;
 
-use Org\Snje\Webnote as Site;
 use Org\Snje\Minifw as FW;
+use App;
 
 /**
  * Description of BaseRoute
@@ -42,15 +42,15 @@ abstract class Base extends FW\Controler {
     }
 
     protected function prev() {
-        $system_obj = Site\Model\System::get();
+        $system_obj = App\Model\System::get();
         FW\Tpl::assign('books', $system_obj->get_booklist());
         FW\Tpl::assign('title', $system_obj->title);
         $auth = $this->config->get_config('main', 'auth', true);
         if (!$auth) {
             return true;
         }
-        if (isset($_SESSION[Site\Model\System::SESSION_AUTH_KEY]) &&
-                $_SESSION[Site\Model\System::SESSION_AUTH_KEY] == true) {
+        if (isset($_SESSION[App\Model\System::SESSION_AUTH_KEY]) &&
+                $_SESSION[App\Model\System::SESSION_AUTH_KEY] == true) {
             return true;
         }
 

@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Model;
+namespace App\Model;
 
 use Org\Snje\Minifw as FW;
-use Org\Snje\Webnote as Site;
+use App;
 
 /**
  * Description of BookUtils
@@ -50,9 +50,11 @@ class BookUtils {
                     $page_obj->get_book()
                     , $page_obj->get_path() . '/' . strval($post['name']));
             return $new_page->addpage($post['content'], $msg);
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -78,9 +80,11 @@ class BookUtils {
                     $file_obj->get_book()
                     , $file_obj->get_path() . '/' . $name);
             return $new_file->upload($_FILES['file'], $msg);
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -102,9 +106,11 @@ class BookUtils {
                     $page_obj->get_book()
                     , $page_obj->get_path() . '/' . strval($post['name']));
             return $new_page->adddir();
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -126,9 +132,11 @@ class BookUtils {
                     $file_obj->get_book()
                     , $file_obj->get_path() . '/' . strval($post['name']));
             return $new_dir->adddir();
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -148,9 +156,11 @@ class BookUtils {
 
         try {
             return $page_obj->edit(strval($post['content']), $msg);
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -169,9 +179,11 @@ class BookUtils {
         }
         try {
             return $page_obj->delete($msg);
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -190,9 +202,11 @@ class BookUtils {
         }
         try {
             return $file_obj->delete($msg);
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -207,9 +221,11 @@ class BookUtils {
         }
         try {
             return $page_obj->delete();
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -224,9 +240,11 @@ class BookUtils {
         }
         try {
             return $file_obj->delete();
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -238,9 +256,11 @@ class BookUtils {
         }
         try {
             return $book_obj->git_cmd('push');
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
@@ -252,22 +272,24 @@ class BookUtils {
         }
         try {
             return $book_obj->git_cmd('pull');
-        } catch (FW\Exception $ex) {
+        }
+        catch (FW\Exception $ex) {
             throw $ex;
-        } catch (\RuntimeException $ex) {
+        }
+        catch (\RuntimeException $ex) {
             throw new FW\Exception('操作失败');
         }
     }
 
     /**
-     * @return \Org\Snje\Webnote\Model\Book
+     * @return \App\Model\Book
      */
     public static function get_book_from_url($url) {
-        $book_url = Site\Model\BookUrl::create(strval($url));
+        $book_url = App\Model\BookUrl::create(strval($url));
         if ($book_url == null) {
             return null;
         }
-        $book_obj = Site\Model\Book::create($book_url);
+        $book_obj = App\Model\Book::create($book_url);
         if ($book_obj == null) {
             return null;
         }
@@ -275,14 +297,14 @@ class BookUtils {
     }
 
     /**
-     * @return \Org\Snje\Webnote\Model\BookPage
+     * @return \App\Model\BookPage
      */
     public static function get_page_from_url($url, $allow_suggest = false, $allow_null = false) {
-        $book_url = Site\Model\BookUrl::create(strval($url));
+        $book_url = App\Model\BookUrl::create(strval($url));
         if ($book_url == null) {
             return null;
         }
-        $book_obj = Site\Model\Book::create($book_url);
+        $book_obj = App\Model\Book::create($book_url);
         if ($book_obj == null) {
             return null;
         }
@@ -296,20 +318,21 @@ class BookUtils {
     }
 
     /**
-     * @return \Org\Snje\Webnote\Model\BookFile
+     * @return \App\Model\BookFile
      */
     public static function get_file_from_url($url, $allow_suggest = false, $allow_null = false) {
-        $book_url = Site\Model\BookUrl::create(strval($url));
+        $book_url = App\Model\BookUrl::create(strval($url));
         if ($book_url == null) {
             return null;
         }
-        $book_obj = Site\Model\Book::create($book_url);
+        $book_obj = App\Model\Book::create($book_url);
         if ($book_obj == null) {
             return null;
         }
         if ($allow_suggest) {
             return $book_obj->get_file($book_url, $allow_suggest);
-        } elseif ($allow_null) {
+        }
+        elseif ($allow_null) {
             return new BookPage($book_obj, $book_url->get_page());
         }
         return $book_obj->get_file($book_url);
@@ -334,9 +357,11 @@ class BookUtils {
     public static function comp_pagefirst($a, $b) {
         if ($a['dir'] == $b['dir']) {
             return strcmp($a['name'], $b['name']);
-        } elseif ($a['dir'] === true) {
+        }
+        elseif ($a['dir'] === true) {
             return 1;
-        } else {
+        }
+        else {
             return -1;
         }
     }
@@ -344,9 +369,11 @@ class BookUtils {
     public static function comp_dirfirst($a, $b) {
         if ($a['dir'] == $b['dir']) {
             return strcmp($a['name'], $b['name']);
-        } elseif ($a['dir'] === true) {
+        }
+        elseif ($a['dir'] === true) {
             return -1;
-        } else {
+        }
+        else {
             return 1;
         }
     }

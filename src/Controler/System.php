@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Controler;
+namespace App\Controler;
 
-use Org\Snje\Webnote as Site;
 use Org\Snje\Minifw as FW;
+use App;
 
 /**
  * Description of System
@@ -30,7 +30,7 @@ use Org\Snje\Minifw as FW;
 class System extends Base {
 
     private function c_chpwd($args) {
-        $system_obj = Site\Model\System::get();
+        $system_obj = App\Model\System::get();
         if (strlen($system_obj->password) == 0) {
             $this->redirect('/system/setpwd');
         }
@@ -42,11 +42,11 @@ class System extends Base {
     }
 
     private function c_setpwd($args) {
-        if (isset($_SESSION[Site\Model\System::SESSION_AUTH_KEY]) &&
-                $_SESSION[Site\Model\System::SESSION_AUTH_KEY] == true) {
+        if (isset($_SESSION[App\Model\System::SESSION_AUTH_KEY]) &&
+                $_SESSION[App\Model\System::SESSION_AUTH_KEY] == true) {
             $this->redirect('/book/view');
         }
-        $system_obj = Site\Model\System::get();
+        $system_obj = App\Model\System::get();
         if (strlen($system_obj->password) != 0) {
             $this->redirect('/system/login');
         }
@@ -58,11 +58,11 @@ class System extends Base {
     }
 
     private function c_login($args) {
-        if (isset($_SESSION[Site\Model\System::SESSION_AUTH_KEY]) &&
-                $_SESSION[Site\Model\System::SESSION_AUTH_KEY] == true) {
+        if (isset($_SESSION[App\Model\System::SESSION_AUTH_KEY]) &&
+                $_SESSION[App\Model\System::SESSION_AUTH_KEY] == true) {
             $this->redirect('/book/view/');
         }
-        $system_obj = Site\Model\System::get();
+        $system_obj = App\Model\System::get();
         if (strlen($system_obj->password) == 0) {
             $this->redirect('/system/setpwd');
         }
@@ -78,11 +78,11 @@ class System extends Base {
     }
 
     private function c_logout($args) {
-        $this->json_call([], [Site\Model\System::get(), 'logout']);
+        $this->json_call([], [App\Model\System::get(), 'logout']);
     }
 
     private function c_clearcache($args) {
-        $this->json_call([], [Site\Model\System::get(), 'clearcache']);
+        $this->json_call([], [App\Model\System::get(), 'clearcache']);
     }
 
 }

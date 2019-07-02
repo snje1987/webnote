@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Model;
+namespace App\Model;
 
 use Org\Snje\Minifw as FW;
-use Org\Snje\Webnote as Site;
+use App;
 
 /**
  * Description of BookPage
@@ -31,7 +31,7 @@ class BookPage extends BookNode {
 
     /**
      *
-     * @var \Org\Snje\Webnote\Model\Book
+     * @var \App\Model\Book
      */
     public static $always_compile;
 
@@ -42,9 +42,9 @@ class BookPage extends BookNode {
     const COUNT_PER_PAGE = 20;
 
     /**
-     * @param \Org\Snje\Webnote\Model\Book $book
+     * @param \App\Model\Book $book
      * @param string $page 页面的路径
-     * @return \Org\Snje\Webnote\Model\BookPage
+     * @return \App\Model\BookPage
      */
     public function __construct($book, $page) {
         parent::__construct($book, $page);
@@ -90,7 +90,7 @@ class BookPage extends BookNode {
     }
 
     /**
-     * @return \Org\Snje\Webnote\Model\BookPage
+     * @return \App\Model\BookPage
      */
     public function get_first_page() {
         return $this->first_sub_node('.md', __NAMESPACE__ . '\BookUtils::comp_pagefirst');

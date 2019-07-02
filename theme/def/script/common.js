@@ -32,7 +32,8 @@
                         }
                         if (data.returl && data.returl !== '') {
                             window.location = data.returl;
-                        } else {
+                        }
+                        else {
                             location.reload();
                         }
                     },
@@ -106,7 +107,7 @@
                         submited = false;
                         return;
                     }
-                    if (data.succeed === true) {
+                    if (data.error === 0) {
                         if (data.msg) {
                             alert(data.msg);
                         }
@@ -116,11 +117,13 @@
                         if (data.returl && data.returl !== '') {
                             window.location = data.returl;
                             return;
-                        } else {
+                        }
+                        else {
                             location.reload();
                             return;
                         }
-                    } else {
+                    }
+                    else {
                         if (data.msg) {
                             alert(data.msg);
                         }
@@ -149,6 +152,20 @@
             var $this = $(this);
             var toolbar = '';
             var info = '';
+            var cur_words = -1;
+            var auto_save_timer = null;
+            var auto_save = function () {
+                if (auto_save_timer !== null) {
+                    clearTimeout(auto_save_timer);
+                }
+                auto_save_timer = setTimeout(auto_save, 30000);
+                var page = $('input[name="page"]').val();
+                var content = $this.val();
+                $.post('/book/edit/', {
+                    page: page,
+                    content: content
+                });
+            };
             var calc_word = function () {
                 if (info === '') {
                     return;
@@ -156,6 +173,15 @@
                 var str = $this.val();
                 str = str.replace(/(\s|　)/g, '');
                 info.html('当前字数：' + str.length);
+                if (cur_words == -1) {
+                    cur_words = str.length;
+                }
+                else {
+                    if (Math.abs(cur_words - str.length) >= 20) {
+                        auto_save();
+                        cur_words = str.length;
+                    }
+                }
             };
             if (defaults.info !== '') {
                 info = $(defaults.info).eq(index);
@@ -176,6 +202,7 @@
                 });
                 toolbar.append(autoformat);
             }
+            auto_save_timer = setTimeout(auto_save, 30000);
         });
     };//}}}
     $.show_poprelay = function () {//{{{
@@ -207,7 +234,8 @@
                         modal.find('.modal-body').html(listCache[path]);
                     }
                 });
-            } else {
+            }
+            else {
                 modal.find('.modal-body').html(listCache[path]);
             }
 

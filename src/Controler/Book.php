@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Controler;
+namespace App\Controler;
 
 use Org\Snje\Minifw as FW;
-use Org\Snje\Webnote as Site;
+use App;
 
 class Book extends Base {
 
     protected function c_file($args) {
         try {
-            $file_obj = Site\Model\BookUtils::get_file_from_url($args);
+            $file_obj = App\Model\BookUtils::get_file_from_url($args);
             if ($file_obj != null && $file_obj->is_file()) {
                 $file_obj->readfile();
             }
@@ -36,19 +36,19 @@ class Book extends Base {
     }
 
     private function c_fileview($args) {
-        $book_obj = Site\Model\BookUtils::get_book_from_url($args);
+        $book_obj = App\Model\BookUtils::get_book_from_url($args);
         if ($book_obj == null) {
             $this->show_last_page();
             return;
         }
         try {
-            $file_obj = Site\Model\BookUtils::get_file_from_url($args, true);
+            $file_obj = App\Model\BookUtils::get_file_from_url($args, true);
             if ($file_obj == null) {
                 $this->show_last_page();
                 return;
             }
             if ($file_obj->is_dir()) {
-                FW\Tpl::assign('list', $file_obj->get_sub_nodes('', 'Org\\Snje\\Webnote\\Model\\BookUtils::comp_dirfirst'));
+                FW\Tpl::assign('list', $file_obj->get_sub_nodes('', 'App\\Model\\BookUtils::comp_dirfirst'));
             }
 
             FW\Tpl::prepend('title', $file_obj->get_url() . '-');
@@ -60,7 +60,7 @@ class Book extends Base {
     }
 
     private function c_filelist($args) {
-        $file_obj = Site\Model\BookUtils::get_file_from_url($args);
+        $file_obj = App\Model\BookUtils::get_file_from_url($args);
         if ($file_obj == null) {
             die();
         }
@@ -69,26 +69,26 @@ class Book extends Base {
         }
 
         if ($file_obj->is_root()) {
-            $system_obj = Site\Model\System::get();
+            $system_obj = App\Model\System::get();
             $books = $system_obj->get_booklist();
             FW\Tpl::assign('is_book', true);
             FW\Tpl::assign('books', $books);
         } else {
             FW\Tpl::assign('is_book', false);
-            $siblings = $file_obj->get_siblings_nodes('', 'Org\\Snje\\Webnote\\Model\\BookUtils::comp_dirfirst');
+            $siblings = $file_obj->get_siblings_nodes('', 'App\\Model\\BookUtils::comp_dirfirst');
             FW\Tpl::assign('list', $siblings);
         }
         FW\Tpl::display('/book/filelist', $file_obj, $this->theme);
     }
 
     private function c_view($args) {
-        $book_obj = Site\Model\BookUtils::get_book_from_url($args);
+        $book_obj = App\Model\BookUtils::get_book_from_url($args);
         if ($book_obj == null) {
             $this->show_last_page();
             return;
         }
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($args, true);
+            $page_obj = App\Model\BookUtils::get_page_from_url($args, true);
             if ($page_obj == null) {
                 $this->show_last_page($book_obj->get_book_name());
                 return;
@@ -103,10 +103,10 @@ class Book extends Base {
 
     private function c_edit($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::editpage');
+            $this->json_call($_POST, 'App\Model\BookUtils::editpage');
         }
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            $page_obj = App\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null) {
                 $this->show_last_page();
                 return;
@@ -121,7 +121,7 @@ class Book extends Base {
     }
 
     private function c_list($args) {
-        $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+        $page_obj = App\Model\BookUtils::get_page_from_url($args);
         if ($page_obj == null) {
             die();
         }
@@ -130,24 +130,24 @@ class Book extends Base {
         }
 
         if ($page_obj->is_root()) {
-            $system_obj = Site\Model\System::get();
+            $system_obj = App\Model\System::get();
             $books = $system_obj->get_booklist();
             FW\Tpl::assign('is_book', true);
             FW\Tpl::assign('books', $books);
         } else {
             FW\Tpl::assign('is_book', false);
-            $siblings = $page_obj->get_siblings_nodes('.md', 'Org\\Snje\\Webnote\\Model\\BookUtils::comp_dirfirst');
+            $siblings = $page_obj->get_siblings_nodes('.md', 'App\\Model\\BookUtils::comp_dirfirst');
             FW\Tpl::assign('list', $siblings);
         }
         FW\Tpl::display('/book/list', $page_obj, $this->theme);
     }
 
     private function c_push($args) {
-        $this->json_call($args, 'Org\Snje\Webnote\Model\BookUtils::push');
+        $this->json_call($args, 'App\Model\BookUtils::push');
     }
 
     private function c_pull($args) {
-        $this->json_call($args, 'Org\Snje\Webnote\Model\BookUtils::pull');
+        $this->json_call($args, 'App\Model\BookUtils::pull');
     }
 
     private function c_history($args) {
@@ -160,7 +160,7 @@ class Book extends Base {
         $url = strval($matches[2]);
 
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($url);
+            $page_obj = App\Model\BookUtils::get_page_from_url($url);
             if ($page_obj == null) {
                 $this->show_last_page();
                 return;
@@ -184,7 +184,7 @@ class Book extends Base {
         $commit_hash = strval($matches[1]);
         $url = strval($matches[2]);
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($url);
+            $page_obj = App\Model\BookUtils::get_page_from_url($url);
             if ($page_obj == null) {
                 $this->show_last_page();
                 return;
@@ -205,10 +205,10 @@ class Book extends Base {
         $this->show_last_page();
         return;
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::movepage');
+            $this->json_call($_POST, 'App\Model\BookUtils::movepage');
         }
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            $page_obj = App\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null || !$page_obj->is_file()) {
                 $this->show_last_page();
                 return;
@@ -229,10 +229,10 @@ class Book extends Base {
 
     private function c_addpage($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addpage');
+            $this->json_call($_POST, 'App\Model\BookUtils::addpage');
         }
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
+            $page_obj = App\Model\BookUtils::get_page_from_url($args, false, true);
             if ($page_obj == null) {
                 $this->show_last_page();
                 return;
@@ -254,10 +254,10 @@ class Book extends Base {
 
     private function c_addfile($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addfile');
+            $this->json_call($_POST, 'App\Model\BookUtils::addfile');
         }
         try {
-            $file_obj = Site\Model\BookUtils::get_file_from_url($args);
+            $file_obj = App\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null) {
                 $this->show_last_page();
                 return;
@@ -273,10 +273,10 @@ class Book extends Base {
 
     private function c_adddir($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::adddir');
+            $this->json_call($_POST, 'App\Model\BookUtils::adddir');
         }
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($args, false, true);
+            $page_obj = App\Model\BookUtils::get_page_from_url($args, false, true);
             if ($page_obj == null) {
                 $this->show_last_page();
                 return;
@@ -298,10 +298,10 @@ class Book extends Base {
 
     private function c_addfiledir($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::addfiledir');
+            $this->json_call($_POST, 'App\Model\BookUtils::addfiledir');
         }
         try {
-            $file_obj = Site\Model\BookUtils::get_file_from_url($args);
+            $file_obj = App\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null) {
                 $this->show_last_page();
                 return;
@@ -317,10 +317,10 @@ class Book extends Base {
 
     private function c_delpage($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delpage');
+            $this->json_call($_POST, 'App\Model\BookUtils::delpage');
         }
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            $page_obj = App\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null || !$page_obj->is_file()) {
                 $this->show_last_page();
                 return;
@@ -336,10 +336,10 @@ class Book extends Base {
 
     private function c_delfile($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delfile');
+            $this->json_call($_POST, 'App\Model\BookUtils::delfile');
         }
         try {
-            $file_obj = Site\Model\BookUtils::get_file_from_url($args);
+            $file_obj = App\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null || !$file_obj->is_file()) {
                 $this->show_last_page();
                 return;
@@ -355,10 +355,10 @@ class Book extends Base {
 
     private function c_deldir($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::deldir');
+            $this->json_call($_POST, 'App\Model\BookUtils::deldir');
         }
         try {
-            $page_obj = Site\Model\BookUtils::get_page_from_url($args);
+            $page_obj = App\Model\BookUtils::get_page_from_url($args);
             if ($page_obj == null || !$page_obj->is_dir()) {
                 $this->show_last_page();
                 return;
@@ -374,10 +374,10 @@ class Book extends Base {
 
     private function c_delfiledir($args) {
         if ($_POST) {
-            $this->json_call($_POST, 'Org\Snje\Webnote\Model\BookUtils::delfiledir');
+            $this->json_call($_POST, 'App\Model\BookUtils::delfiledir');
         }
         try {
-            $file_obj = Site\Model\BookUtils::get_file_from_url($args);
+            $file_obj = App\Model\BookUtils::get_file_from_url($args);
             if ($file_obj == null || !$file_obj->is_dir()) {
                 $this->show_last_page();
                 return;
@@ -392,7 +392,7 @@ class Book extends Base {
     }
 
     private function show_last_page($bookname = '') {
-        $system_obj = Site\Model\System::get();
+        $system_obj = App\Model\System::get();
         $books = $system_obj->get_booklist(false);
         if ($bookname !== '' && isset($books[$bookname])) {
             $path = $books[$bookname]['last_page'];

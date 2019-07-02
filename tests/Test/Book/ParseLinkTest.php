@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\WebnoteTest\Test\Book;
+namespace AppTest\Test\Book;
 
-use Org\Snje\WebnoteTest;
-use Org\Snje\Webnote;
+use AppTest;
+use App;
 
 /**
  * Description of BookTest

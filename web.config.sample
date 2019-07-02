@@ -4,14 +4,22 @@
         <rewrite>
             <rules>
                 <rule name="Default" stopProcessing="true">
-                    <match url="^www/.*$" negate="true" />
-                    <action type="Rewrite" url="www/index.php" />
+                    <match url="^index.php$" negate="true" />
+                    <action type="Rewrite" url="index.php" />
+                    <conditions>
+                        <add input="{URL}" pattern="^/www/.*" negate="true" />
+                    </conditions>
                 </rule>
             </rules>
         </rewrite>
         <staticContent>
             <mimeMap fileExtension=".woff2" mimeType="application/x-font-woff" />
             <mimeMap fileExtension=".woff" mimeType="application/x-font-woff" />
+            <mimeMap fileExtension=".json" mimeType="text/json" />
         </staticContent>
+        <handlers>
+            <add name="php" path="/index.php" verb="*" modules="FastCgiModule" scriptProcessor="XXX\php-cgi.exe" resourceType="Unspecified" requireAccess="Script" />
+            <add name="block" path="*.php" verb="*" modules="ProtocolSupportModule" resourceType="Unspecified" requireAccess="Script" />
+        </handlers>
     </system.webServer>
 </configuration>

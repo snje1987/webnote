@@ -2,8 +2,6 @@
 
 //是否开启调试模式
 $cfg['debug']['debug'] = 0;
-//session域
-$cfg['main']['domain'] = '.webnote.snje.org';
 
 $cfg['main']['encoding'] = 'utf-8';
 //文件系统的编码

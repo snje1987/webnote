@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Model;
+namespace App\Model;
 
-use Org\Snje\Webnote as Site;
 use Org\Snje\Minifw as FW;
+use App;
 
 /**
  * Description of System

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\WebnoteTest;
+namespace AppTest;
 
 use Org\Snje\Minifw as FW;
 

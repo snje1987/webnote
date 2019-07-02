@@ -18,23 +18,34 @@ $value[] = [
     'type' => 'dir',
     'map' => [
         '/www/lib/bootstrap/' => '/vendor/twbs/bootstrap/dist/',
-        '/www/lib/bootstrap-select/' => '/vendor/bootstrap-select/bootstrap-select/dist/',
+        '/www/lib/bootstrap-select/' => '/vendor/snapappointments/bootstrap-select/dist/',
         '/www/lib/font-awesome/css/' => '/vendor/fortawesome/font-awesome/css/',
         '/www/lib/font-awesome/fonts/' => '/vendor/fortawesome/font-awesome/fonts/',
     ],
 ];
 $value[] = [
-    'method' => 'cssmin',
+    'method' => 'css',
     'type' => 'dir',
+    'tail' => '.css',
     'map' => [
         '/www/theme/def/style/' => '/theme/def/style/',
+        '/www/static/' => '/theme/static/',
     ],
 ];
 $value[] = [
-    'method' => 'uglify',
+    'method' => 'js',
     'type' => 'dir',
+    'tail' => '.js',
     'map' => [
         '/www/theme/def/script/' => '/theme/def/script/',
+        '/www/static/' => '/theme/static/',
+    ],
+];
+$value[] = [
+    'method' => 'copy',
+    'type' => 'dir',
+    'map' => [
+        '/www/static/' => '/theme/static/',
     ],
 ];
 return $value;

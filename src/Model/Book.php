@@ -8,10 +8,10 @@
  * @Description
  */
 
-namespace Org\Snje\Webnote\Model;
+namespace App\Model;
 
 use Org\Snje\Minifw as FW;
-use Org\Snje\Webnote as Site;
+use App;
 
 class Book {
 
@@ -27,12 +27,12 @@ class Book {
     const BOOK_E_REDIRECT = 1;
 
     /**
-     * @param \Org\Snje\Webnote\Model\BookUrl $url
-     * @return \Org\Snje\Webnote\Model\Book
+     * @param \App\Model\BookUrl $url
+     * @return \App\Model\Book
      */
     public static function create($url) {
         $book_name = $url->get_book();
-        $system_obj = Site\Model\System::get();
+        $system_obj = App\Model\System::get();
         $books = $system_obj->get_booklist();
         try {
             if (!isset($books[$book_name])) {
@@ -70,9 +70,9 @@ class Book {
     /**
      * 返回一个页面，如果不存在则返回null
      *
-     * @param \Org\Snje\Webnote\Model\BookUrl $url
+     * @param \App\Model\BookUrl $url
      * @param boolean $allow_suggest 页面不存在时是否提供备用选项
-     * @return \Org\Snje\Webnote\Model\BookPage
+     * @return \App\Model\BookPage
      */
     public function get_page($url, $allow_suggest = false) {
         $page = $url->get_page();
@@ -109,8 +109,8 @@ class Book {
     /**
      * 返回一个文件，如果不存在则返回null
      *
-     * @param \Org\Snje\Webnote\Model\BookUrl $url
-     * @return \Org\Snje\Webnote\Model\BookFile
+     * @param \App\Model\BookUrl $url
+     * @return \App\Model\BookFile
      */
     public function get_file($url, $allow_suggest = false) {
         $file_obj = $url->get_page();

@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Org\Snje\Webnote\Model;
+namespace App\Model;
 
 use Org\Snje\Minifw as FW;
-use Org\Snje\Webnote as Site;
+use App;
 
 /**
  * Description of BookPage
@@ -31,7 +31,7 @@ abstract class BookNode {
 
     /**
      *
-     * @var \Org\Snje\Webnote\Model\Book
+     * @var \App\Model\Book
      */
     protected $book_obj;
     protected $dir;
@@ -45,9 +45,9 @@ abstract class BookNode {
     const TYPE_DIR = 2;
 
     /**
-     * @param \Org\Snje\Webnote\Model\Book $book
+     * @param \App\Model\Book $book
      * @param string $path 页面的路径
-     * @return \Org\Snje\Webnote\Model\BookPage
+     * @return \App\Model\BookPage
      */
     public function __construct($book, $path) {
         $path = str_replace('..', '', $path);
@@ -106,7 +106,7 @@ abstract class BookNode {
     }
 
     /**
-     * @return \Org\Snje\Webnote\Model\Book
+     * @return \App\Model\Book
      */
     public function get_book() {
         return $this->book_obj;
@@ -154,7 +154,7 @@ abstract class BookNode {
     }
 
     /**
-     * @return \Org\Snje\Webnote\Model\BookPage
+     * @return \App\Model\BookPage
      */
     public function get_parent() {
         if ($this->file != '') {

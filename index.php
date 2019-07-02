@@ -1,13 +1,12 @@
 <?php
 
-namespace Org\Snje\Webnote;
+namespace App;
 
 use Org\Snje\Minifw as FW;
-use Org\Snje\Webnote as WN;
 
-require_once '../vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
-$app = FW\System::get(dirname(__DIR__) . '/src/defaults.php');
+$app = FW\System::get(__DIR__. '/src/defaults.php');
 
 $app->reg_call('/^\/www\/([^?#]+).*$/', function($path) {
     $path = str_replace('..', '', $path);
@@ -33,7 +32,7 @@ $app->reg_call('/^([^?#]*)(.*)?$/', function($path, $nouse = '') {
     }
     try {
         $router = new FW\Router();
-        $router->single_layer_route($path, 'Org\Snje\Webnote\Controler', '');
+        $router->single_layer_route($path, 'App\\Controler', '');
     } catch (\Exception $ex) {
         $controler = new FW\Controler();
         $controler->redirect('/book/view/');

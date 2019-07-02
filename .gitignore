@@ -7,7 +7,7 @@
 /tests_data/*/html/
 *.swp
 /.well-known/
-/www/lib/
+/www/
 /.htaccess
 /web.config
-/www/theme/
+/tmp/

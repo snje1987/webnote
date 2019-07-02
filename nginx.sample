@@ -1,0 +1,17 @@
+server {
+    listen 80;
+    server_name sample.snje.org;
+    root "XXXXX";
+    location ^~ /www/ {
+        access_log off;
+    }
+    location / {
+        index index.html index.htm index.php;
+        if ( $uri !~* "^/index.php$" ){
+            rewrite .* /index.php last;
+        }
+    }
+    location = /index.php {
+        ......
+    }
+}
