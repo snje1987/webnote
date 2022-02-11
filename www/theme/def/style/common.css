@@ -104,6 +104,22 @@
     background-color:#F8F8F8;
     border-radius:5px;
 }
+#diff_show{
+    overflow:auto;
+    max-height:350px;
+    margin:10px 0;
+    font-family:"Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+    background-color:#F8F8F8;
+    border:1px solid #CCCCCC;
+    padding:0 0.3em;
+    line-height:18px;
+    border-radius:5px;
+    font-size:12px;
+}
+#diff_show p{
+    white-space:pre;
+    margin: 0;
+}
 #page code, .code code{
     font-family:"Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
     background-color:#F8F8F8;

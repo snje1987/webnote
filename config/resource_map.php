@@ -23,29 +23,4 @@ $value[] = [
         '/www/lib/font-awesome/fonts/' => '/vendor/fortawesome/font-awesome/fonts/',
     ],
 ];
-$value[] = [
-    'method' => 'css',
-    'type' => 'dir',
-    'tail' => '.css',
-    'map' => [
-        '/www/theme/def/style/' => '/theme/def/style/',
-        '/www/static/' => '/theme/static/',
-    ],
-];
-$value[] = [
-    'method' => 'js',
-    'type' => 'dir',
-    'tail' => '.js',
-    'map' => [
-        '/www/theme/def/script/' => '/theme/def/script/',
-        '/www/static/' => '/theme/static/',
-    ],
-];
-$value[] = [
-    'method' => 'copy',
-    'type' => 'dir',
-    'map' => [
-        '/www/static/' => '/theme/static/',
-    ],
-];
 return $value;

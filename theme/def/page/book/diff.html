@@ -95,7 +95,7 @@
                 </pre>
                 <{/if}>
                 <div class="panel-body">
-                    <pre class="code">
+                    <div id="diff_show" class="code">
                     <{foreach $lines $k $line}>
                         <{$type = $line->getType()}>
                         <{if $type == 'chunk'}>
@@ -112,7 +112,7 @@
                         </pre>
                         <{/if}>
                     <{/foreach}>
-                    </pre>
+                    </div>
                 </div>
             <{/if}>
         </div>
