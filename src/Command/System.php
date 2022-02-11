@@ -15,21 +15,4 @@ class System extends CommandBase {
         $client->update_caroot();
     }
 
-    /**
-     * 复制资源文件
-     */
-    public function cmd_copy_resource($args) {
-        echo "clear old files\n";
-
-        FW\File::clear_dir('/www/theme', false);
-        FW\File::clear_dir('/www/lib', false);
-        FW\File::clear_dir('/www/static', false);
-
-        echo "copy new files\n";
-        $obj = new FW\Resource();
-        $obj->compile_all();
-
-        echo "done\n";
-    }
-
 }
